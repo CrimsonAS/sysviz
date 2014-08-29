@@ -3,22 +3,7 @@
 
 #include <QAbstractListModel>
 
-#include "slice.h"
-
-class CpuFrequencySlice : public Slice
-{
-public:
-    CpuFrequencySlice(timeval startTime, timeval endTime, int frequency)
-    : Slice(startTime, endTime)
-    , m_frequency(frequency)
-    {
-    }
-
-    int frequency() const { return m_frequency; }
-
-private:
-    int m_frequency;
-};
+class CpuFrequencySlice;
 
 class CpuFrequencyModel : public QAbstractListModel
 {
@@ -29,8 +14,11 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 
+    void changeFrequency(timeval time, int frequency);
+
 private:
-    QVector<CpuFrequencySlice> m_slices;
+    QVector<CpuFrequencySlice *> m_slices;
+    CpuFrequencySlice *m_currentSlice;
 };
 
 #endif

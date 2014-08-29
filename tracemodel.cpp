@@ -77,10 +77,13 @@ void TraceModel::addEvent(const TraceEvent &te)
 
         // params looks like:
         // QMap(("cpu_id", "1")("state", "918000"))
-        while (te.parameters()["cpu_id"].toInt() >= cpuCount()) {
+        int cpuid = te.parameters()["cpu_id"].toInt(); // TODO: errcheck
+        while (cpuid >= cpuCount()) {
             qDebug() << "Creating new CPU frequency model";
             m_cpuFrequencyModels.append(new CpuFrequencyModel(this));
         }
+
+        m_cpuFrequencyModels.at(cpuid)->changeFrequency(te.timestamp(), te.parameters()["state"].toInt() /* TODO: errcheck */);
     } else if (te.eventName() == "kgsl_pwrlevel") {
         // Events look like:
         // TraceEvent(15024 117918.600719 "kworker/u:2" 0 "kgsl_pwrlevel" "d_name=kgsl-3d0 pwrlevel=0 freq=450000000")

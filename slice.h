@@ -15,6 +15,8 @@ public:
     timeval startTime() const { return m_startTime; }
     timeval endTime() const { return m_endTime; }
 
+    void setEndTime(timeval end) { m_endTime = end; }
+
 private:
     timeval m_startTime;
     timeval m_endTime;
