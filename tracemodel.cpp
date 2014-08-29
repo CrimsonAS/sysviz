@@ -68,7 +68,43 @@ TraceModel *TraceModel::fromFile(QFile *f)
             } else if (te.eventName() == "workqueue_activate_work") {
                 // TODO: parse later
             } else if (te.eventName() == "tracing_mark_write") {
-                // drop them
+                // Events look like:
+                //  TraceEvent(17399 117943.616803 "sailfish-maps" 1 "tracing_mark_write" "B|17399|QSGTR::pAS::lock::graphics")
+
+                // the type of systrace event depends on the first character..
+                switch (te.details().at(0).toLatin1()) {
+                    case 'B':
+                        // B|17399|QSGTR::pAS::lock::graphics
+                        // B|pid|<stuff>
+                        //
+                        // starts a slice, ended by E
+                        // the 'stuff' is used to describe the event...
+                        break;
+                    case 'E':
+                        // E
+                        // ends the most recent B slice
+                        break;
+                    case 'S':
+                        // S|17399|QPixmap::loadFromData::graphics|0xbe9d8e20"
+                        // S|pid|<stuff>|<uid>
+                        //
+                        // starts an asynchronous slice.
+                        // <stuff> describes the event, <uid> is some unique
+                        // string identifying this event so it can be determined
+                        // in F
+                        break;
+                    case 'F':
+                        // F|17399|QPixmap::loadFromData::graphics|0xbe9d8e20
+                        // same syntactically as S, except ending the event.
+                        break;
+                    case 'C':
+                        // TODO
+                        qWarning() << "Unhandled counter slice " << te;
+                        break;
+                    default:
+                        qWarning() << "Unknown systrace type " << te;
+                        break;
+                }
             } else {
                 qWarning() << "Unhandled event: " << te;
             }
