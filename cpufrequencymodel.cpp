@@ -26,6 +26,13 @@ CpuFrequencyModel::CpuFrequencyModel(QObject *parent)
 
 int CpuFrequencyModel::rowCount(const QModelIndex &parent) const
 {
+#if 0
+    for (int i = 0; i < m_slices.count(); ++i) {
+        qDebug().nospace() << "Slice start " << i << m_slices.at(i)->startTime().tv_sec << "." << m_slices.at(i)->startTime().tv_usec
+            << " slice end " << m_slices.at(i)->endTime().tv_sec << "." << m_slices.at(i)->endTime().tv_usec 
+            << " freq " << m_slices.at(i)->frequency();
+    }
+#endif
     return m_slices.count();
 }
 
