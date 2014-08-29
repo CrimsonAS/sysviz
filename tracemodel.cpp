@@ -118,20 +118,60 @@ void TraceModel::addEvent(const TraceEvent &te)
         // QMap(("d_name", "kgsl-3d0")("freq", "450000000")("pwrlevel", "0"))
     } else if (te.eventName() == "block_rq_issue") {
         // TODO: parse later
+        static bool warned = false;
+        if (!warned) {
+            qWarning() << "I don't yet know how to handle event of type " << te.eventName();
+            warned = true;
+        }
     } else if (te.eventName() == "block_rq_complete") {
         // TODO: parse later
+        static bool warned = false;
+        if (!warned) {
+            qWarning() << "I don't yet know how to handle event of type " << te.eventName();
+            warned = true;
+        }
     } else if (te.eventName() == "sched_switch") {
         // TODO: parse later
+        static bool warned = false;
+        if (!warned) {
+            qWarning() << "I don't yet know how to handle event of type " << te.eventName();
+            warned = true;
+        }
     } else if (te.eventName() == "sched_wakeup") {
         // TODO: parse later
+        static bool warned = false;
+        if (!warned) {
+            qWarning() << "I don't yet know how to handle event of type " << te.eventName();
+            warned = true;
+        }
     } else if (te.eventName() == "workqueue_execute_start") {
         // TODO: parse later
+        static bool warned = false;
+        if (!warned) {
+            qWarning() << "I don't yet know how to handle event of type " << te.eventName();
+            warned = true;
+        }
     } else if (te.eventName() == "workqueue_execute_end") {
         // TODO: parse later
+        static bool warned = false;
+        if (!warned) {
+            qWarning() << "I don't yet know how to handle event of type " << te.eventName();
+            warned = true;
+        }
     } else if (te.eventName() == "workqueue_queue_work") {
         // TODO: parse later
+        static bool warned = false;
+        if (!warned) {
+            qWarning() << "I don't yet know how to handle event of type " << te.eventName();
+            warned = true;
+        }
     } else if (te.eventName() == "workqueue_activate_work") {
         // TODO: parse later
+        static bool warned = false;
+        if (!warned) {
+            qWarning() << "I don't yet know how to handle event of type " << te.eventName();
+            warned = true;
+        }
     } else if (te.eventName() == "tracing_mark_write") {
         // Events look like:
         //  TraceEvent(17399 117943.616803 "sailfish-maps" 1 "tracing_mark_write" "B|17399|QSGTR::pAS::lock::graphics")
