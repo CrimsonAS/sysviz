@@ -6,7 +6,7 @@
 class CpuFrequencySlice : public Slice
 {
 public:
-    CpuFrequencySlice(timeval startTime, timeval endTime, int frequency)
+    CpuFrequencySlice(const TraceTime &startTime, const TraceTime &endTime, int frequency)
     : Slice(startTime, endTime)
     , m_frequency(frequency)
     {
@@ -67,7 +67,7 @@ QHash<int, QByteArray> CpuFrequencyModel::roleNames() const
     return roles;
 }
 
-void CpuFrequencyModel::changeFrequency(timeval time, int frequency)
+void CpuFrequencyModel::changeFrequency(const TraceTime &time, int frequency)
 {
     if (m_currentSlice) {
         if (frequency == m_currentSlice->frequency())

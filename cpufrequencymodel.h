@@ -3,6 +3,8 @@
 
 #include <QAbstractListModel>
 
+#include "tracetime.h"
+
 class CpuFrequencySlice;
 
 class CpuFrequencyModel : public QAbstractListModel
@@ -23,7 +25,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
     QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
-    void changeFrequency(timeval time, int frequency);
+    void changeFrequency(const TraceTime &time, int frequency);
 
 private:
     QVector<CpuFrequencySlice *> m_slices;

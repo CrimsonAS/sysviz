@@ -4,6 +4,8 @@
 #include <QString>
 #include <QDebug>
 
+#include "tracetime.h"
+
 class TraceEvent
 {
     TraceEvent();
@@ -12,7 +14,7 @@ public:
     QString threadName() const { return m_threadName; }
     pid_t pid() const { return m_pid; }
     int cpuNumber() const { return m_cpu; }
-    timeval timestamp() const { return m_timestamp; }
+    TraceTime timestamp() const { return m_timestamp; }
     QString eventName() const { return m_eventName; }
     QString details() const { return m_details; }
     bool isValid() const;
@@ -23,7 +25,7 @@ private:
     QString m_threadName;
     pid_t m_pid;
     int m_cpu;
-    timeval m_timestamp;
+    TraceTime m_timestamp;
     QString m_eventName;
     QString m_details;
     QMap<QString, QString> m_parameters;

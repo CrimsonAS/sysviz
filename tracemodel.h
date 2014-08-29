@@ -25,8 +25,8 @@ signals:
     void cpuCountChanged();
 
 private:
-    timeval m_earliestEvent;
-    timeval m_latestEvent;
+    TraceTime m_earliestEvent;
+    TraceTime m_latestEvent;
     QVector<CpuFrequencyModel *> m_cpuFrequencyModels;
 };
 

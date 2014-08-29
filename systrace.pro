@@ -11,7 +11,8 @@ SOURCES = \
 HEADERS = \
     tracemodel.h \
     slice.h \
-    cpufrequencymodel.h
+    cpufrequencymodel.h \
+    tracetime.h
 
 CONFIG -= app_bundle
 CONFIG += c++11

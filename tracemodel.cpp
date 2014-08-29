@@ -62,7 +62,7 @@ void TraceModel::addEvent(const TraceEvent &te)
     if (!te.isValid())
         return;
 
-    timeval ts = te.timestamp();
+    TraceTime ts = te.timestamp();
 
     if (m_earliestEvent.tv_sec > ts.tv_sec ||
         (m_earliestEvent.tv_sec == ts.tv_sec && m_earliestEvent.tv_usec > ts.tv_usec)) {
@@ -97,7 +97,7 @@ void TraceModel::addEvent(const TraceEvent &te)
             emit cpuCountChanged();
         }
 
-        m_cpuFrequencyModels.at(cpuid)->changeFrequency(te.timestamp(), te.parameters()["state"].toInt() /* TODO: errcheck */);
+        m_cpuFrequencyModels.at(cpuid)->changeFrequency(te.timestamp() - m_earliestEvent, te.parameters()["state"].toInt() /* TODO: errcheck */);
     } else if (te.eventName() == "kgsl_pwrlevel") {
         // Events look like:
         // TraceEvent(15024 117918.600719 "kworker/u:2" 0 "kgsl_pwrlevel" "d_name=kgsl-3d0 pwrlevel=0 freq=450000000")
