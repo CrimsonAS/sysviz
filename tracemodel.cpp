@@ -65,7 +65,7 @@ TraceModel *TraceModel::fromFile(QFile *f)
             } else if (te.eventName() == "tracing_mark_write") {
                 // drop them
             } else {
-                qDebug() << te;
+                qWarning() << "Unhandled event: " << te;
             }
         }
     }
