@@ -12,6 +12,10 @@ public:
     static TraceModel *fromFile(QFile *f);
 
 private:
+    TraceModel();
+
+    timeval m_earliestEvent;
+    timeval m_latestEvent;
 };
 
 #endif // TRACEMODEL_H

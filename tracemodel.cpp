@@ -5,8 +5,28 @@
 #include "traceevent.h"
 #include "tracemodel.h"
 
+#include <sys/time.h>
+
+TraceModel::TraceModel()
+{
+    m_earliestEvent.tv_sec = std::numeric_limits<long>::max();
+#if defined(Q_OS_MAC)
+    m_earliestEvent.tv_usec = std::numeric_limits<suseconds_t>::max();
+#else
+    m_earliestEvent.tv_usec = std::numeric_limits<long>::max();
+#endif
+
+    m_latestEvent.tv_sec = std::numeric_limits<long>::min();
+#if defined(Q_OS_MAC)
+    m_latestEvent.tv_usec = std::numeric_limits<suseconds_t>::max();
+#else
+    m_latestEvent.tv_usec = std::numeric_limits<long>::min();
+#endif
+}
+
 TraceModel *TraceModel::fromFile(QFile *f)
 {
+    TraceModel *tm = new TraceModel;
     QElapsedTimer fileTimer;
     fileTimer.start();
 
@@ -14,7 +34,18 @@ TraceModel *TraceModel::fromFile(QFile *f)
         QByteArray line = f->readLine();
         TraceEvent te = TraceEvent::fromString(line);
         if (te.isValid()) {
-            // do the general processing first
+            timeval ts = te.timestamp();
+
+            if (tm->m_earliestEvent.tv_sec > ts.tv_sec)
+                tm->m_earliestEvent = ts;
+            else if (tm->m_earliestEvent.tv_sec == ts.tv_sec && tm->m_earliestEvent.tv_usec > ts.tv_usec)
+                tm->m_earliestEvent = ts;
+
+            if (tm->m_latestEvent.tv_sec < ts.tv_sec)
+                tm->m_latestEvent = ts;
+            else if (tm->m_latestEvent.tv_sec == ts.tv_sec && tm->m_latestEvent.tv_usec < ts.tv_usec)
+                tm->m_latestEvent = ts;
+
             if (te.eventName() == "cpu_idle") {
                 // Events look like:
                 // TraceEvent(0 117925.355823 "<idle>" 1 "cpu_idle" "state=3 cpu_id=1")
@@ -94,7 +125,9 @@ TraceModel *TraceModel::fromFile(QFile *f)
     }
 
     qDebug() << "File processed in " << fileTimer.elapsed();
-    return new TraceModel;
+    qDebug() << "Earliest event: " << tm->m_earliestEvent.tv_sec << "." << tm->m_earliestEvent.tv_usec;
+    qDebug() << "Latest event: " << tm->m_latestEvent.tv_sec << "." << tm->m_latestEvent.tv_usec;
+    return tm;
 }
 
 // Thoughts about how to present this...
