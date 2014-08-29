@@ -9,12 +9,14 @@ SOURCES = \
     main.cpp \
     traceevent.cpp \
     tracemodel.cpp \
-    cpufrequencymodel.cpp
+    cpufrequencymodel.cpp \
+    cpucstatemodel.cpp
 
 HEADERS = \
     tracemodel.h \
     slice.h \
     cpufrequencymodel.h \
+    cpucstatemodel.h \
     tracetime.h
 
 CONFIG -= app_bundle

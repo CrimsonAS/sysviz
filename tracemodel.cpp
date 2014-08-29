@@ -5,6 +5,7 @@
 
 #include "traceevent.h"
 #include "tracemodel.h"
+#include "cpucstatemodel.h"
 #include "cpufrequencymodel.h"
 
 #include <sys/time.h>
@@ -12,6 +13,7 @@
 TraceModel::TraceModel()
 {
     qmlRegisterType<CpuFrequencyModel>();
+    qmlRegisterType<CpuCStateModel>();
 
     m_earliestEvent.tv_sec = std::numeric_limits<long>::max();
 #if defined(Q_OS_MAC)
@@ -39,6 +41,8 @@ TraceModel::TraceModel()
 
     for (int i = 0; i < cpuCount(); ++i)
         qDebug() << "Frequency model for CPU ID " << i << " has " << cpuFrequencyModel(i)->rowCount(QModelIndex()) << " slices";
+    for (int i = 0; i < cpuCount(); ++i)
+        qDebug() << "C-state model for CPU ID " << i << " has " << cpuCStateModel(i)->rowCount(QModelIndex()) << " slices";
 }
 
 void TraceModel::initFromFile(QFile *f)
@@ -84,6 +88,14 @@ void TraceModel::addEvent(const TraceEvent &te)
 
         // params looks like:
         // QMap(("cpu_id", "1")("state", "0"))
+        int cpuid = te.parameters()["cpu_id"].toInt(); // TODO: errcheck
+        while (cpuid >= m_cpuCStateModels.count()) {
+            qDebug() << "Creating new CPU C-state model";
+            m_cpuCStateModels.append(new CpuCStateModel(this));
+            emit cpuCountChanged();
+        }
+
+        m_cpuCStateModels.at(cpuid)->changeCState(te.timestamp() - m_earliestEvent, te.parameters()["state"].toInt() /* TODO: errcheck */);
     } else if (te.eventName() == "cpu_frequency") {
         // Events look like:
         // TraceEvent(17742 117943.296614 "kworker/1:0" 1 "cpu_frequency" "state=918000 cpu_id=1")
@@ -91,7 +103,7 @@ void TraceModel::addEvent(const TraceEvent &te)
         // params looks like:
         // QMap(("cpu_id", "1")("state", "918000"))
         int cpuid = te.parameters()["cpu_id"].toInt(); // TODO: errcheck
-        while (cpuid >= cpuCount()) {
+        while (cpuid >= m_cpuFrequencyModels.count()) {
             qDebug() << "Creating new CPU frequency model";
             m_cpuFrequencyModels.append(new CpuFrequencyModel(this));
             emit cpuCountChanged();
@@ -165,16 +177,23 @@ void TraceModel::addEvent(const TraceEvent &te)
 
 int TraceModel::cpuCount() const
 {
-    // TODO: std::max() on cpufrequency and c-state?
-    return m_cpuFrequencyModels.count();
+    return std::max(m_cpuFrequencyModels.count(), m_cpuCStateModels.count());
 }
 
 CpuFrequencyModel *TraceModel::cpuFrequencyModel(int cpu) const
 {
-    Q_ASSERT(cpu >= 0 && cpu < cpuCount());
+    Q_ASSERT(cpu >= 0 && cpu < m_cpuFrequencyModels.count());
 
     return m_cpuFrequencyModels.at(cpu);
 }
+
+CpuCStateModel *TraceModel::cpuCStateModel(int cpu) const
+{
+    Q_ASSERT(cpu >= 0 && cpu < m_cpuCStateModels.count());
+
+    return m_cpuCStateModels.at(cpu);
+}
+
 
 // Thoughts about how to present this...
 //
