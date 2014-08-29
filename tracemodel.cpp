@@ -85,6 +85,12 @@ TraceModel *TraceModel::fromFile(QFile *f)
 //  - C2 (second level of idle, slower to wake)
 //  - C3 (third state of idle, all clocks stopped)
 //
+// TraceModel::gpuCount
+// TraceModel::gpuModel(int gpu)
+//
+// GpuModel contains slices about frequency changes in the GPU
+// (e.g. powered by kgsl_pwrlevel on the Jolla)
+//
 // TraceModel::processCount
 // TraceModel::processModel(int process)
 //
