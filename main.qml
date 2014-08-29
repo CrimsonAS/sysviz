@@ -48,6 +48,19 @@ Window {
                             delegate: Text {
                                 text: model.startSeconds + "." +
                                 model.startMicroSeconds + "-" + model.endSeconds + "." + model.endMicroSeconds + " -- " + model.cstate
+
+                                color: {
+                                    switch (model.cstate) {
+                                        case 0:
+                                            return "#aa3939"
+                                        case 1:
+                                            return "#aa6c39"
+                                        case 2:
+                                            return "#2d882d"
+                                        case 3:
+                                            return "#226666"
+                                    }
+                                }
                             }
                         }
                     }
