@@ -23,6 +23,10 @@ TraceModel *TraceModel::fromFile(QFile *f)
 //
 // CpuModel would contain a bunch of slices for frequency, maybe C-state if it's
 // useful..
+//  - C0 (operational, CPU fully on)
+//  - C1 (first level of idle)
+//  - C2 (second level of idle, slower to wake)
+//  - C3 (third state of idle, all clocks stopped)
 //
 // TraceModel::processCount
 // TraceModel::processModel(int process)
