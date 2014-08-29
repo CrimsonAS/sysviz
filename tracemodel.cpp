@@ -7,13 +7,16 @@
 #include "tracemodel.h"
 #include "cpucstatemodel.h"
 #include "cpufrequencymodel.h"
+#include "gpufrequencymodel.h"
 
 #include <sys/time.h>
 
 TraceModel::TraceModel()
+    : m_gpuFrequencyModel(0)
 {
     qmlRegisterType<CpuFrequencyModel>();
     qmlRegisterType<CpuCStateModel>();
+    qmlRegisterType<GpuFrequencyModel>();
 
     m_earliestEvent.tv_sec = std::numeric_limits<long>::max();
 #if defined(Q_OS_MAC)
@@ -43,6 +46,7 @@ TraceModel::TraceModel()
         qDebug() << "Frequency model for CPU ID " << i << " has " << cpuFrequencyModel(i)->rowCount(QModelIndex()) << " slices";
     for (int i = 0; i < cpuCount(); ++i)
         qDebug() << "C-state model for CPU ID " << i << " has " << cpuCStateModel(i)->rowCount(QModelIndex()) << " slices";
+    qDebug() << "GPU frequency model has " << gpuFrequencyModel()->rowCount(QModelIndex()) << " slices";
 }
 
 void TraceModel::initFromFile(QFile *f)
@@ -116,6 +120,14 @@ void TraceModel::addEvent(const TraceEvent &te)
 
         // params looks like:
         // QMap(("d_name", "kgsl-3d0")("freq", "450000000")("pwrlevel", "0"))
+        // XXX: we're currently only assuming a single GPU. this is not correct.
+        if (!m_gpuFrequencyModel) {
+            qDebug() << "Creating GPU frequency model";
+            m_gpuFrequencyModel = new GpuFrequencyModel(this);
+        }
+
+        // TODO: what does the 'pwrlevel' mean?
+        m_gpuFrequencyModel->changeFrequency(te.timestamp() - m_earliestEvent, te.parameters()["freq"].toInt() /* TODO: errcheck */);
     } else if (te.eventName() == "block_rq_issue") {
         // TODO: parse later
         static bool warned = false;
@@ -234,6 +246,15 @@ CpuCStateModel *TraceModel::cpuCStateModel(int cpu) const
     return m_cpuCStateModels.at(cpu);
 }
 
+GpuFrequencyModel *TraceModel::gpuFrequencyModel() const
+{
+    if (!m_gpuFrequencyModel) {
+        TraceModel *that = const_cast<TraceModel *>(this);
+        that->m_gpuFrequencyModel = new GpuFrequencyModel(that);
+    }
+
+    return m_gpuFrequencyModel;
+}
 
 // Thoughts about how to present this...
 //

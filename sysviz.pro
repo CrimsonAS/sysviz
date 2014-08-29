@@ -10,14 +10,16 @@ SOURCES = \
     traceevent.cpp \
     tracemodel.cpp \
     cpufrequencymodel.cpp \
-    cpucstatemodel.cpp
+    cpucstatemodel.cpp \
+    gpufrequencymodel.cpp
 
 HEADERS = \
     tracemodel.h \
     slice.h \
     cpufrequencymodel.h \
     cpucstatemodel.h \
-    tracetime.h
+    tracetime.h \
+    gpufrequencymodel.h
 
 CONFIG -= app_bundle
 CONFIG += c++11

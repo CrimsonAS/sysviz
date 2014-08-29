@@ -46,8 +46,7 @@ Window {
                         Repeater {
                             model: tm.cpuCStateModel(modelData)
                             delegate: Text {
-                                text: model.startSeconds + "." +
-                                model.startMicroSeconds + "-" + model.endSeconds + "." + model.endMicroSeconds + " -- " + model.cstate
+                                text: model.startSeconds + "." + model.startMicroSeconds + "-" + model.endSeconds + "." + model.endMicroSeconds + " -- " + model.cstate
 
                                 color: {
                                     switch (model.cstate) {
@@ -62,6 +61,19 @@ Window {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+
+                Column {
+                    Text {
+                        font.pixelSize: 30
+                        text: "GPU frequency"
+                    }
+                    Repeater {
+                        model: tm.gpuFrequencyModel()
+                        delegate: Text {
+                        text: model.startSeconds + "." + model.startMicroSeconds + "-" + model.endSeconds + "." + model.endMicroSeconds + " -- " + model.frequency
                         }
                     }
                 }

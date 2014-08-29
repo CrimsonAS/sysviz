@@ -3,11 +3,13 @@
 
 #include <QObject>
 
-#include "cpufrequencymodel.h"
-#include "cpucstatemodel.h"
-
 class QFile;
 class TraceEvent;
+
+#include "cpufrequencymodel.h"
+#include "cpucstatemodel.h"
+#include "gpufrequencymodel.h"
+#include "tracetime.h"
 
 class TraceModel : public QObject
 {
@@ -23,6 +25,8 @@ public:
     Q_INVOKABLE CpuFrequencyModel *cpuFrequencyModel(int cpu) const;
     Q_INVOKABLE CpuCStateModel *cpuCStateModel(int cpu) const;
 
+    Q_INVOKABLE GpuFrequencyModel *gpuFrequencyModel() const;
+
 signals:
     void cpuCountChanged();
 
@@ -31,6 +35,7 @@ private:
     TraceTime m_latestEvent;
     QVector<CpuFrequencyModel *> m_cpuFrequencyModels;
     QVector<CpuCStateModel *> m_cpuCStateModels;
+    GpuFrequencyModel *m_gpuFrequencyModel;
 };
 
 #endif // TRACEMODEL_H
