@@ -4,12 +4,14 @@
 #include <QObject>
 
 class QFile;
+class TraceEvent;
 
 class TraceModel : public QObject
 {
     Q_OBJECT
 public:
     static TraceModel *fromFile(QFile *f);
+    void addEvent(const TraceEvent &te);
 
 private:
     TraceModel();
