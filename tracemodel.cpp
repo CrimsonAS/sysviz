@@ -14,7 +14,8 @@ TraceModel *TraceModel::fromFile(QFile *f)
             QMap<QString, QString> params;
 
             if (te.eventName() == "cpu_idle" ||
-                te.eventName() == "cpu_frequency") {
+                te.eventName() == "cpu_frequency" ||
+                te.eventName() == "kgsl_pwrlevel") {
                 QList<QString> datas = te.details().split(" ");
                 foreach (const QString &data, datas) {
                     QList<QString> param = data.split("=");
@@ -45,7 +46,11 @@ TraceModel *TraceModel::fromFile(QFile *f)
                 // params looks like:
                 // QMap(("cpu_id", "1")("state", "918000"))
             } else if (te.eventName() == "kgsl_pwrlevel") {
-                // TODO: parse later
+                // Events look like:
+                // TraceEvent(15024 117918.600719 "kworker/u:2" 0 "kgsl_pwrlevel" "d_name=kgsl-3d0 pwrlevel=0 freq=450000000")
+
+                // params looks like:
+                // QMap(("d_name", "kgsl-3d0")("freq", "450000000")("pwrlevel", "0"))
             } else if (te.eventName() == "block_rq_issue") {
                 // TODO: parse later
             } else if (te.eventName() == "block_rq_complete") {
