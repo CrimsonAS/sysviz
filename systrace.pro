@@ -1,3 +1,5 @@
+TARGET = sysviz
+
 SOURCES = \
     main.cpp \
     traceevent.cpp \
