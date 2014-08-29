@@ -39,8 +39,8 @@ TraceModel *TraceModel::fromFile(QFile *f)
     }
 
     qDebug() << "File processed in " << fileTimer.elapsed();
-    qDebug() << "Earliest event: " << tm->m_earliestEvent.tv_sec << "." << tm->m_earliestEvent.tv_usec;
-    qDebug() << "Latest event: " << tm->m_latestEvent.tv_sec << "." << tm->m_latestEvent.tv_usec;
+    qDebug().nospace() << "Earliest event: " << tm->m_earliestEvent.tv_sec << "." << tm->m_earliestEvent.tv_usec;
+    qDebug().nospace() << "Latest event: " << tm->m_latestEvent.tv_sec << "." << tm->m_latestEvent.tv_usec;
     return tm;
 }
 
