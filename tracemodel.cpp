@@ -44,6 +44,26 @@ TraceModel *TraceModel::fromFile(QFile *f)
 
                 // params looks like:
                 // QMap(("cpu_id", "1")("state", "918000"))
+            } else if (te.eventName() == "kgsl_pwrlevel") {
+                // TODO: parse later
+            } else if (te.eventName() == "block_rq_issue") {
+                // TODO: parse later
+            } else if (te.eventName() == "block_rq_complete") {
+                // TODO: parse later
+            } else if (te.eventName() == "sched_switch") {
+                // TODO: parse later
+            } else if (te.eventName() == "sched_wakeup") {
+                // TODO: parse later
+            } else if (te.eventName() == "workqueue_execute_start") {
+                // TODO: parse later
+            } else if (te.eventName() == "workqueue_execute_end") {
+                // TODO: parse later
+            } else if (te.eventName() == "workqueue_queue_work") {
+                // TODO: parse later
+            } else if (te.eventName() == "workqueue_activate_work") {
+                // TODO: parse later
+            } else if (te.eventName() == "tracing_mark_write") {
+                // drop them
             } else {
                 qDebug() << te;
             }
