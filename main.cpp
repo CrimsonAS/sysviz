@@ -10,7 +10,7 @@
 int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
-    qmlRegisterType<TraceModel>("my.thing", 1, 0, "TraceModel");
+    qmlRegisterType<TraceModel>("SysViz", 1, 0, "TraceModel");
     QQmlApplicationEngine engine("main.qml");
     return app.exec();
 }

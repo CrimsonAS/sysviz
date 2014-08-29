@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
-import my.thing 1.0
+import SysViz 1.0
 
 Window {
     height: 200
