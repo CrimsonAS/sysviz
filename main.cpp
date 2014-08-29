@@ -1,22 +1,19 @@
 #include <QDebug>
 #include <QFile>
+#include <QCoreApplication>
 
-#include "traceevent.h"
+#include "tracemodel.h"
 
 int main(int argc, char **argv)
 {
+    QCoreApplication app(argc, argv);
+
     QFile f("trace.systrace");
     if (!f.open(QIODevice::ReadOnly)) {
-        perror("Can't open trace");
+        qWarning("Can't open trace");
         return -1;
     }
 
-    while (!f.atEnd()) {
-        QByteArray line = f.readLine();
-        TraceEvent te = TraceEvent::fromString(line);
-        if (te.isValid())
-            qDebug() << te;
-    }
-
+    TraceModel *t = TraceModel::fromFile(&f);
     return 0;
 }
