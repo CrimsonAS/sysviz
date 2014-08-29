@@ -14,6 +14,6 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    TraceModel *t = TraceModel::fromFile(&f);
+    TraceModel::fromFile(&f);
     return 0;
 }
