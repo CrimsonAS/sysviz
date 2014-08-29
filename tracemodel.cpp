@@ -28,7 +28,6 @@ TraceModel::TraceModel()
 TraceModel *TraceModel::fromFile(QFile *f)
 {
     TraceModel *tm = new TraceModel;
-    /* CpuFrequencyModel *cm = */ new CpuFrequencyModel(tm);
 
     QElapsedTimer fileTimer;
     fileTimer.start();
@@ -36,6 +35,7 @@ TraceModel *TraceModel::fromFile(QFile *f)
     while (!f->atEnd()) {
         QByteArray line = f->readLine();
         TraceEvent te = TraceEvent::fromString(line);
+        tm->addEvent(te);
     }
 
     qDebug() << "File processed in " << fileTimer.elapsed();
@@ -47,7 +47,7 @@ TraceModel *TraceModel::fromFile(QFile *f)
 void TraceModel::addEvent(const TraceEvent &te)
 {
     if (!te.isValid())
-    return;
+        return;
 
     timeval ts = te.timestamp();
 
@@ -77,6 +77,10 @@ void TraceModel::addEvent(const TraceEvent &te)
 
         // params looks like:
         // QMap(("cpu_id", "1")("state", "918000"))
+        while (te.parameters()["cpu_id"].toInt() >= cpuCount()) {
+            qDebug() << "Creating new CPU frequency model";
+            m_cpuFrequencyModels.append(new CpuFrequencyModel(this));
+        }
     } else if (te.eventName() == "kgsl_pwrlevel") {
         // Events look like:
         // TraceEvent(15024 117918.600719 "kworker/u:2" 0 "kgsl_pwrlevel" "d_name=kgsl-3d0 pwrlevel=0 freq=450000000")
@@ -140,6 +144,19 @@ void TraceModel::addEvent(const TraceEvent &te)
     } else {
         qWarning() << "Unhandled event: " << te;
     }
+}
+
+int TraceModel::cpuCount() const
+{
+    // TODO: std::max() on cpufrequency and c-state?
+    return m_cpuFrequencyModels.count();
+}
+
+CpuFrequencyModel *TraceModel::cpuFrequencyModel(int cpu) const
+{
+    Q_ASSERT(cpu >= 0 && cpu < cpuCount());
+
+    return m_cpuFrequencyModels.at(cpu);
 }
 
 // Thoughts about how to present this...

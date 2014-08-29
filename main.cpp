@@ -14,6 +14,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    TraceModel::fromFile(&f);
+    TraceModel *tm = TraceModel::fromFile(&f);
+    qDebug() << "Model represents " << tm->cpuCount() << " CPUs";
     return 0;
 }
