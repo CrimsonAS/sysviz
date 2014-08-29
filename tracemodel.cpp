@@ -1,11 +1,15 @@
 #include <QFile>
 #include <QDebug>
+#include <QElapsedTimer>
 
 #include "traceevent.h"
 #include "tracemodel.h"
 
 TraceModel *TraceModel::fromFile(QFile *f)
 {
+    QElapsedTimer fileTimer;
+    fileTimer.start();
+
     while (!f->atEnd()) {
         QByteArray line = f->readLine();
         TraceEvent te = TraceEvent::fromString(line);
@@ -111,6 +115,7 @@ TraceModel *TraceModel::fromFile(QFile *f)
         }
     }
 
+    qDebug() << "File processed in " << fileTimer.elapsed();
     return new TraceModel;
 }
 
