@@ -36,10 +36,14 @@ TraceModel *TraceModel::fromFile(QFile *f)
         if (te.isValid()) {
             timeval ts = te.timestamp();
 
-            if (tm->m_earliestEvent.tv_sec > ts.tv_sec)
+            if (tm->m_earliestEvent.tv_sec > ts.tv_sec ||
+                (tm->m_earliestEvent.tv_sec == ts.tv_sec && tm->m_earliestEvent.tv_usec > ts.tv_usec)) {
+
+                // event time should monotonically increase
+                Q_ASSERT(tm->m_earliestEvent.tv_sec == std::numeric_limits<long>::max());
+
                 tm->m_earliestEvent = ts;
-            else if (tm->m_earliestEvent.tv_sec == ts.tv_sec && tm->m_earliestEvent.tv_usec > ts.tv_usec)
-                tm->m_earliestEvent = ts;
+            }
 
             if (tm->m_latestEvent.tv_sec < ts.tv_sec)
                 tm->m_latestEvent = ts;
