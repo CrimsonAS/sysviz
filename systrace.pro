@@ -1,5 +1,8 @@
 TARGET = sysviz
 
+MOC_DIR = .moc
+OBJECTS_DIR = .obj
+
 QT += quick
 
 SOURCES = \
