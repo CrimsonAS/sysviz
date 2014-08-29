@@ -43,6 +43,9 @@ QVariant CpuFrequencyModel::data(const QModelIndex &index, int role) const
 void CpuFrequencyModel::changeFrequency(timeval time, int frequency)
 {
     if (m_currentSlice) {
+        if (frequency == m_currentSlice->frequency())
+            return; // no point ending it yet
+
         m_currentSlice->setEndTime(time);
     }
 
