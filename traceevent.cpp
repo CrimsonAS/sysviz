@@ -96,6 +96,33 @@ TraceEvent TraceEvent::fromString(const QByteArray &line)
     return te;
 }
 
+QMap<QString, QString> TraceEvent::parameters() const
+{
+    if (!m_parameters.isEmpty())
+        return m_parameters;
+
+    QList<QString> datas = details().split(" ");
+    foreach (const QString &data, datas) {
+        QList<QString> param = data.split("=");
+        if (param.length() < 2) {
+            qWarning() << "Bad param for line " << this;
+            continue;
+        }
+
+
+        if (eventName() == "cpu_idle") {
+            // state 4294967295 is secretly -1 in an unsigned int which
+            // means "exit the current state back to state 0"
+            if (param[0] == "state" && param[1] == "4294967295")
+                param[1] = "0";
+        }
+
+        const_cast<TraceEvent*>(this)->m_parameters[param[0]] = param[1];
+    }
+
+    return m_parameters;
+}
+
 QDebug operator<<(QDebug dbg, const TraceEvent &event)
 {
     dbg.nospace() << "TraceEvent(" << event.pid();

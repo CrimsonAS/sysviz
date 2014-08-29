@@ -16,6 +16,7 @@ public:
     QString eventName() const { return m_eventName; }
     QString details() const { return m_details; }
     bool isValid() const;
+    QMap<QString, QString> parameters() const;
 
     static TraceEvent fromString(const QByteArray &string);
 private:
@@ -25,6 +26,7 @@ private:
     timeval m_timestamp;
     QString m_eventName;
     QString m_details;
+    QMap<QString, QString> m_parameters;
 };
 
 QDebug operator<<(QDebug dbg, const TraceEvent &event);

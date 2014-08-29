@@ -15,31 +15,9 @@ TraceModel *TraceModel::fromFile(QFile *f)
         TraceEvent te = TraceEvent::fromString(line);
         if (te.isValid()) {
             // do the general processing first
-            QMap<QString, QString> params;
-
-            if (te.eventName() == "cpu_idle" ||
-                te.eventName() == "cpu_frequency" ||
-                te.eventName() == "kgsl_pwrlevel") {
-                QList<QString> datas = te.details().split(" ");
-                foreach (const QString &data, datas) {
-                    QList<QString> param = data.split("=");
-                    if (param.length() < 2) {
-                        qWarning() << "Bad param for line " << line;
-                        continue;
-                    }
-
-                    params[param[0]] = param[1];
-                }
-            }
-
             if (te.eventName() == "cpu_idle") {
                 // Events look like:
                 // TraceEvent(0 117925.355823 "<idle>" 1 "cpu_idle" "state=3 cpu_id=1")
-
-                // state 4294967295 is secretly -1 in an unsigned int which
-                // means "exit the current state back to state 0"
-                if (params["state"] == "4294967295")
-                    params["state"] = "0";
 
                 // params looks like:
                 // QMap(("cpu_id", "1")("state", "0"))
