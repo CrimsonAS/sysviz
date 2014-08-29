@@ -12,15 +12,19 @@ class TraceModel : public QObject
 {
     Q_OBJECT
 public:
-    static TraceModel *fromFile(QFile *f);
+    TraceModel();
+    void initFromFile(QFile *f);
     void addEvent(const TraceEvent &te);
 
+    Q_PROPERTY(int cpuCount READ cpuCount NOTIFY cpuCountChanged);
     int cpuCount() const;
-    CpuFrequencyModel *cpuFrequencyModel(int cpu) const;
+
+    Q_INVOKABLE CpuFrequencyModel *cpuFrequencyModel(int cpu) const;
+
+signals:
+    void cpuCountChanged();
 
 private:
-    TraceModel();
-
     timeval m_earliestEvent;
     timeval m_latestEvent;
     QVector<CpuFrequencyModel *> m_cpuFrequencyModels;

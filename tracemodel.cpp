@@ -1,6 +1,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QElapsedTimer>
+#include <QtQml>
 
 #include "traceevent.h"
 #include "tracemodel.h"
@@ -10,6 +11,8 @@
 
 TraceModel::TraceModel()
 {
+    qmlRegisterType<CpuFrequencyModel>();
+
     m_earliestEvent.tv_sec = std::numeric_limits<long>::max();
 #if defined(Q_OS_MAC)
     m_earliestEvent.tv_usec = std::numeric_limits<suseconds_t>::max();
@@ -23,25 +26,35 @@ TraceModel::TraceModel()
 #else
     m_latestEvent.tv_usec = std::numeric_limits<long>::min();
 #endif
+
+    QFile f("trace.systrace");
+    if (!f.open(QIODevice::ReadOnly)) {
+        qWarning("Can't open trace");
+        return;
+    }
+
+    initFromFile(&f);
+
+    qDebug() << "Model represents " << cpuCount() << " CPUs";
+
+    for (int i = 0; i < cpuCount(); ++i)
+        qDebug() << "Frequency model for CPU ID " << i << " has " << cpuFrequencyModel(i)->rowCount(QModelIndex()) << " slices";
 }
 
-TraceModel *TraceModel::fromFile(QFile *f)
+void TraceModel::initFromFile(QFile *f)
 {
-    TraceModel *tm = new TraceModel;
-
     QElapsedTimer fileTimer;
     fileTimer.start();
 
     while (!f->atEnd()) {
         QByteArray line = f->readLine();
         TraceEvent te = TraceEvent::fromString(line);
-        tm->addEvent(te);
+        addEvent(te);
     }
 
     qDebug() << "File processed in " << fileTimer.elapsed();
-    qDebug().nospace() << "Earliest event: " << tm->m_earliestEvent.tv_sec << "." << tm->m_earliestEvent.tv_usec;
-    qDebug().nospace() << "Latest event: " << tm->m_latestEvent.tv_sec << "." << tm->m_latestEvent.tv_usec;
-    return tm;
+    qDebug().nospace() << "Earliest event: " << m_earliestEvent.tv_sec << "." << m_earliestEvent.tv_usec;
+    qDebug().nospace() << "Latest event: " << m_latestEvent.tv_sec << "." << m_latestEvent.tv_usec;
 }
 
 void TraceModel::addEvent(const TraceEvent &te)
@@ -81,6 +94,7 @@ void TraceModel::addEvent(const TraceEvent &te)
         while (cpuid >= cpuCount()) {
             qDebug() << "Creating new CPU frequency model";
             m_cpuFrequencyModels.append(new CpuFrequencyModel(this));
+            emit cpuCountChanged();
         }
 
         m_cpuFrequencyModels.at(cpuid)->changeFrequency(te.timestamp(), te.parameters()["state"].toInt() /* TODO: errcheck */);

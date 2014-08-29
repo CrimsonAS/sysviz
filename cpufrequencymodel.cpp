@@ -38,6 +38,33 @@ int CpuFrequencyModel::rowCount(const QModelIndex &parent) const
 
 QVariant CpuFrequencyModel::data(const QModelIndex &index, int role) const
 {
+    switch (role)
+    {
+        case CpuFrequencyModel::FrequencyRole:
+            return m_slices.at(index.row())->frequency();
+        case CpuFrequencyModel::StartSecondsRole:
+            return (qlonglong)m_slices.at(index.row())->startTime().tv_sec;
+        case CpuFrequencyModel::StartMicroSecondsRole:
+            return (qlonglong)m_slices.at(index.row())->startTime().tv_usec;
+        case CpuFrequencyModel::EndSecondsRole:
+            return (qlonglong)m_slices.at(index.row())->endTime().tv_sec;
+        case CpuFrequencyModel::EndMicroSecondsRole:
+            return (qlonglong)m_slices.at(index.row())->endTime().tv_usec;
+    }
+
+    Q_UNREACHABLE();
+    return QVariant();
+}
+
+QHash<int, QByteArray> CpuFrequencyModel::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+    roles[CpuFrequencyModel::FrequencyRole] = "frequency";
+    roles[CpuFrequencyModel::StartSecondsRole] = "startSeconds";
+    roles[CpuFrequencyModel::StartMicroSecondsRole] = "startMicroSeconds";
+    roles[CpuFrequencyModel::EndSecondsRole] = "endSeconds";
+    roles[CpuFrequencyModel::EndMicroSecondsRole] = "endMicroSeconds";
+    return roles;
 }
 
 void CpuFrequencyModel::changeFrequency(timeval time, int frequency)

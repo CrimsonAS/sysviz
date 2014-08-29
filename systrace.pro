@@ -1,5 +1,7 @@
 TARGET = sysviz
 
+QT += quick
+
 SOURCES = \
     main.cpp \
     traceevent.cpp \
