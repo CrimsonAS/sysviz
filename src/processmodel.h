@@ -12,8 +12,7 @@ public:
     ProcessModel(QObject *parent, qlonglong pid);
 
     enum ModelRoles {
-        PidRole = Qt::UserRole,
-        ThreadModelRole
+        ThreadModelRole = Qt::UserRole,
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;

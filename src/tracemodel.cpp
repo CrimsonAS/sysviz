@@ -48,8 +48,14 @@ TraceModel::TraceModel()
         qDebug() << "C-state model for CPU ID " << i << " has " << cpuCStateModel(i)->rowCount(QModelIndex()) << " slices";
     qDebug() << "GPU frequency model has " << gpuFrequencyModel()->rowCount(QModelIndex()) << " slices";
     qDebug() << "Process model has " << m_processModels.count() << " processes";
-    foreach (ProcessModel *pm, m_processModels)
-        qDebug() << "Process model for PID " << pm->pid() << " has " << pm->rowCount(QModelIndex()) << " threads";
+    foreach (ProcessModel *pm, m_processModels) {
+        int rc = pm->rowCount(QModelIndex());
+        qDebug() << "Process model for PID " << pm->pid() << " has " << rc << " threads";
+        for (int i = 0; i < rc; ++i) {
+            ThreadModel *tm = qvariant_cast<ThreadModel *>(pm->data(pm->index(i, 0), ProcessModel::ThreadModelRole));
+            qDebug() << "Thread " << tm->threadName();
+        }
+    }
 }
 
 void TraceModel::initFromFile(QFile *f)
@@ -191,6 +197,8 @@ void TraceModel::addEvent(const TraceEvent &te)
         // Events look like:
         //  TraceEvent(17399 117943.616803 "sailfish-maps" 1 "tracing_mark_write" "B|17399|QSGTR::pAS::lock::graphics")
 
+        // XXX: we need to use the PID given after the B event, as it may not
+        // match the event PID
         if (!m_processModels.contains(te.pid())) {
             qDebug() << "Creating process model for PID " << te.pid();
             m_processModels[te.pid()] = new ProcessModel(this, te.pid());

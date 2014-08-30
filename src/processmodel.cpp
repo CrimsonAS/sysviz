@@ -16,12 +16,11 @@ int ProcessModel::rowCount(const QModelIndex &parent) const
 
 QVariant ProcessModel::data(const QModelIndex &index, int role) const
 {
+    Q_ASSERT(index.row() >= 0 && index.row() < m_threads.count());
     switch (role)
     {
-        case ProcessModel::PidRole:
-            return m_pid;
-//        case ProcessModel::ThreadModelRole:
-//            return m_threads.at(index.row());
+        case ProcessModel::ThreadModelRole:
+            return QVariant::fromValue(m_threads.at(index.row()));
     }
 
     Q_UNREACHABLE();
@@ -31,8 +30,7 @@ QVariant ProcessModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> ProcessModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[ProcessModel::PidRole] = "pid";
-//    roles[ProcessModel::ThreadModelRole] = "threadModel";
+    roles[ProcessModel::ThreadModelRole] = "threadModel";
     return roles;
 }
 
