@@ -7,10 +7,10 @@ class ThreadModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    ThreadModel(QObject *parent, const QString &threadName);
+    ThreadModel(QObject *parent, qlonglong pid, const QString &threadName);
 
     enum ModelRoles {
-        ThreadNameRole = Qt::UserRole
+//        ThreadNameRole = Qt::UserRole
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
@@ -18,8 +18,10 @@ public:
     QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
     QString threadName() const { return m_threadName; }
+    qlonglong pid() const { return m_pid; }
 
 private:
+    qlonglong m_pid;
     QString m_threadName;
 };
 

@@ -8,15 +8,20 @@
 #include "cpucstatemodel.h"
 #include "cpufrequencymodel.h"
 #include "gpufrequencymodel.h"
+#include "processmodel.h"
+#include "threadmodel.h"
 
 #include <sys/time.h>
 
 TraceModel::TraceModel()
     : m_gpuFrequencyModel(0)
+    , m_processModel(new ProcessModel(this))
 {
     qmlRegisterType<CpuFrequencyModel>();
     qmlRegisterType<CpuCStateModel>();
     qmlRegisterType<GpuFrequencyModel>();
+    qmlRegisterType<ProcessModel>();
+    qmlRegisterType<ThreadModel>();
 
     m_earliestEvent.tv_sec = std::numeric_limits<long>::max();
 #if defined(Q_OS_MAC)
@@ -47,14 +52,10 @@ TraceModel::TraceModel()
     for (int i = 0; i < cpuCount(); ++i)
         qDebug() << "C-state model for CPU ID " << i << " has " << cpuCStateModel(i)->rowCount(QModelIndex()) << " slices";
     qDebug() << "GPU frequency model has " << gpuFrequencyModel()->rowCount(QModelIndex()) << " slices";
-    qDebug() << "Process model has " << m_processModels.count() << " processes";
-    foreach (ProcessModel *pm, m_processModels) {
-        int rc = pm->rowCount(QModelIndex());
-        qDebug() << "Process model for PID " << pm->pid() << " has " << rc << " threads";
-        for (int i = 0; i < rc; ++i) {
-            ThreadModel *tm = qvariant_cast<ThreadModel *>(pm->data(pm->index(i, 0), ProcessModel::ThreadModelRole));
-            qDebug() << "Thread " << tm->threadName();
-        }
+    qDebug() << "Process model has " << m_processModel->rowCount(QModelIndex()) << " threads";
+    for (int i = 0; i < m_processModel->rowCount(QModelIndex()); ++i) {
+        ThreadModel *tm = qvariant_cast<ThreadModel *>(m_processModel->data(m_processModel->index(i, 0), ProcessModel::ThreadModelRole));
+        qDebug() << "Thread " << tm->threadName() << " for PID " << tm->pid() << " has " << tm->rowCount(QModelIndex()) << " slices";
     }
 }
 
@@ -209,12 +210,7 @@ void TraceModel::addEvent(const TraceEvent &te)
                 // starts a slice, ended by E
                 // the 'stuff' is used to describe the event...
                 ppid = fields[1].toLongLong(); // TODO: errcheck
-                if (!m_processModels.contains(ppid)) {
-                    qDebug() << "Creating process model for PID " << ppid;
-                    m_processModels[ppid] = new ProcessModel(this, ppid);
-                }
-
-                m_processModels[ppid]->ensureThread(te.threadName());
+                m_processModel->ensureThread(ppid, te.threadName());
                 break;
             case 'E':
                 // E
@@ -273,6 +269,11 @@ GpuFrequencyModel *TraceModel::gpuFrequencyModel() const
     }
 
     return m_gpuFrequencyModel;
+}
+
+ProcessModel *TraceModel::processModel() const
+{
+    return m_processModel;
 }
 
 // Thoughts about how to present this...

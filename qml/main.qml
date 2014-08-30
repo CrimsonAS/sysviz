@@ -77,6 +77,32 @@ Window {
                         }
                     }
                 }
+
+                Column {
+                    Text {
+                        font.pixelSize: 30
+                        text: "Processes & Threads"
+                    }
+                    Repeater {
+                        id: outer
+                        model: tm.processModel()
+                        delegate: Column {
+                            id: delegate
+                            property var mytm: model.threadModel
+                            Text {
+                                text: model.pid + " " + model.threadName
+                            }
+
+                            Repeater {
+                                model: delegate.mytm
+                                delegate: Text{
+                                    text: model.name
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
         }
     }

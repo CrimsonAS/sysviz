@@ -5,8 +5,9 @@
 
 // XXX: threads have an id, perhaps we should use the tid for unique
 // identification, and keep the name for display purposes only
-ThreadModel::ThreadModel(QObject *parent, const QString &threadName)
+ThreadModel::ThreadModel(QObject *parent, qlonglong pid, const QString &threadName)
     : QAbstractListModel(parent)
+    , m_pid(pid)
     , m_threadName(threadName)
 {
 }
@@ -20,8 +21,8 @@ QVariant ThreadModel::data(const QModelIndex &index, int role) const
 {
     switch (role)
     {
-        case ThreadModel::ThreadNameRole:
-            return m_threadName;
+//        case ThreadModel::ThreadNameRole:
+//            return m_threadName;
     }
 
     Q_UNREACHABLE();
@@ -31,7 +32,7 @@ QVariant ThreadModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> ThreadModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[ThreadModel::ThreadNameRole] = "name";
+//    roles[ThreadModel::ThreadNameRole] = "name";
     return roles;
 }
 
