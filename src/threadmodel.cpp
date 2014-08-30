@@ -3,6 +3,8 @@
 #include "threadmodel.h"
 #include "slice.h"
 
+// XXX: threads have an id, perhaps we should use the tid for unique
+// identification, and keep the name for display purposes only
 ThreadModel::ThreadModel(QObject *parent, const QString &threadName)
     : QAbstractListModel(parent)
     , m_threadName(threadName)
