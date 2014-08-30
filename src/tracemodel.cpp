@@ -188,6 +188,11 @@ void TraceModel::addEvent(const TraceEvent &te)
         // Events look like:
         //  TraceEvent(17399 117943.616803 "sailfish-maps" 1 "tracing_mark_write" "B|17399|QSGTR::pAS::lock::graphics")
 
+        if (!m_processModels.contains(te.pid())) {
+            qDebug() << "Creating process model for PID " << te.pid();
+            m_processModels[te.pid()] = new ProcessModel(this, te.pid());
+        }
+
         // the type of systrace event depends on the first character..
         switch (te.details().at(0).toLatin1()) {
             case 'B':

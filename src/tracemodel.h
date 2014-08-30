@@ -10,6 +10,7 @@ class TraceEvent;
 #include "cpucstatemodel.h"
 #include "gpufrequencymodel.h"
 #include "tracetime.h"
+#include "processmodel.h"
 
 class TraceModel : public QObject
 {
@@ -36,6 +37,7 @@ private:
     QVector<CpuFrequencyModel *> m_cpuFrequencyModels;
     QVector<CpuCStateModel *> m_cpuCStateModels;
     GpuFrequencyModel *m_gpuFrequencyModel;
+    QMap<qlonglong, ProcessModel *> m_processModels;
 };
 
 #endif // TRACEMODEL_H

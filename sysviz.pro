@@ -11,7 +11,8 @@ SOURCES = \
     src/tracemodel.cpp \
     src/cpufrequencymodel.cpp \
     src/cpucstatemodel.cpp \
-    src/gpufrequencymodel.cpp
+    src/gpufrequencymodel.cpp \
+    src/processmodel.cpp
 
 HEADERS = \
     src/tracemodel.h \
@@ -19,7 +20,8 @@ HEADERS = \
     src/cpufrequencymodel.h \
     src/cpucstatemodel.h \
     src/tracetime.h \
-    src/gpufrequencymodel.h
+    src/gpufrequencymodel.h \
+    src/processmodel.h
 
 CONFIG -= app_bundle
 CONFIG += c++11
