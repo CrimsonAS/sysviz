@@ -37,3 +37,14 @@ QHash<int, QByteArray> ProcessModel::roleNames() const
     return roles;
 }
 
+void ProcessModel::ensureThread(const QString &threadName)
+{
+    for (int i = 0; i < m_threads.count(); ++i) {
+        if (m_threads.at(i)->threadName() == threadName)
+            return;
+    }
+
+    qDebug() << "Creating thread model for " << threadName << " on pid " << m_pid;
+    m_threads.append(new ThreadModel(this, threadName));
+}
+

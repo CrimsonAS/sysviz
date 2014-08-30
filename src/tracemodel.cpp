@@ -193,6 +193,8 @@ void TraceModel::addEvent(const TraceEvent &te)
             m_processModels[te.pid()] = new ProcessModel(this, te.pid());
         }
 
+        m_processModels[te.pid()]->ensureThread(te.threadName());
+
         // the type of systrace event depends on the first character..
         switch (te.details().at(0).toLatin1()) {
             case 'B':

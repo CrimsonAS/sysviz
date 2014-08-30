@@ -1,30 +1,26 @@
-#ifndef PROCESSMODEL_H
-#define PROCESSMODEL_H
+#ifndef THREADMODEL_H
+#define THREADMODEL_H
 
 #include <QAbstractListModel>
 
-#include "threadmodel.h"
-
-class ProcessModel : public QAbstractListModel
+class ThreadModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    ProcessModel(QObject *parent, qlonglong pid);
+    ThreadModel(QObject *parent, const QString &threadName);
 
     enum ModelRoles {
-        PidRole = Qt::UserRole,
-        ThreadModelRole
+        ThreadNameRole = Qt::UserRole
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
     QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
 
-    void ensureThread(const QString &threadName);
+    QString threadName() const { return m_threadName; }
 
 private:
-    QVector<ThreadModel *> m_threads;
-    qlonglong m_pid;
+    QString m_threadName;
 };
 
 #endif
