@@ -197,23 +197,24 @@ void TraceModel::addEvent(const TraceEvent &te)
         // Events look like:
         //  TraceEvent(17399 117943.616803 "sailfish-maps" 1 "tracing_mark_write" "B|17399|QSGTR::pAS::lock::graphics")
 
-        // XXX: we need to use the PID given after the B event, as it may not
-        // match the event PID
-        if (!m_processModels.contains(te.pid())) {
-            qDebug() << "Creating process model for PID " << te.pid();
-            m_processModels[te.pid()] = new ProcessModel(this, te.pid());
-        }
-
-        m_processModels[te.pid()]->ensureThread(te.threadName());
+        pid_t ppid = te.pid();
+        QList<QString> fields = te.details().split('|');
 
         // the type of systrace event depends on the first character..
-        switch (te.details().at(0).toLatin1()) {
+        switch (fields[0][0].toLatin1()) {
             case 'B':
                 // B|17399|QSGTR::pAS::lock::graphics
                 // B|pid|<stuff>
                 //
                 // starts a slice, ended by E
                 // the 'stuff' is used to describe the event...
+                ppid = fields[1].toLongLong(); // TODO: errcheck
+                if (!m_processModels.contains(ppid)) {
+                    qDebug() << "Creating process model for PID " << ppid;
+                    m_processModels[ppid] = new ProcessModel(this, ppid);
+                }
+
+                m_processModels[ppid]->ensureThread(te.threadName());
                 break;
             case 'E':
                 // E
