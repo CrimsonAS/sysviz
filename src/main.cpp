@@ -11,6 +11,6 @@ int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
     qmlRegisterType<TraceModel>("SysViz", 1, 0, "TraceModel");
-    QQmlApplicationEngine engine("main.qml");
+    QQmlApplicationEngine engine("qml/main.qml");
     return app.exec();
 }
