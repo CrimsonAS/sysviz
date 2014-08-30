@@ -22,6 +22,8 @@ public:
 
     void ensureThread(const QString &threadName);
 
+    qlonglong pid() const { return m_pid; }
+
 private:
     QVector<ThreadModel *> m_threads;
     qlonglong m_pid;

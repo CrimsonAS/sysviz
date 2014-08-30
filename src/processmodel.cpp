@@ -11,8 +11,7 @@ ProcessModel::ProcessModel(QObject *parent, qlonglong pid)
 
 int ProcessModel::rowCount(const QModelIndex &parent) const
 {
-    return 0;
-//    return m_threads.count();
+    return m_threads.count();
 }
 
 QVariant ProcessModel::data(const QModelIndex &index, int role) const

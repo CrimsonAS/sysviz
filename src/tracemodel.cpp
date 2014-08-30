@@ -47,6 +47,9 @@ TraceModel::TraceModel()
     for (int i = 0; i < cpuCount(); ++i)
         qDebug() << "C-state model for CPU ID " << i << " has " << cpuCStateModel(i)->rowCount(QModelIndex()) << " slices";
     qDebug() << "GPU frequency model has " << gpuFrequencyModel()->rowCount(QModelIndex()) << " slices";
+    qDebug() << "Process model has " << m_processModels.count() << " processes";
+    foreach (ProcessModel *pm, m_processModels)
+        qDebug() << "Process model for PID " << pm->pid() << " has " << pm->rowCount(QModelIndex()) << " threads";
 }
 
 void TraceModel::initFromFile(QFile *f)
