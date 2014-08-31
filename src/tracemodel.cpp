@@ -216,7 +216,8 @@ void TraceModel::addSystraceEvent(const TraceEvent &te)
             // the 'stuff' is used to describe the event...
             ppid = fields[1].toLongLong(); // TODO: errcheck
             ppids[te.pid()] = ppid;
-            m_processModel->ensureThread(ppid, te.threadName());
+            ThreadModel *tmodel = m_processModel->ensureThread(ppid, te.threadName());
+            tmodel->addDurationSlice(te.timestamp() - m_earliestEvent, fields[2]); // TODO: fields[2] should be a join of fields[2-and-up] in case the field contains a | we split on
             break;
         }
         case 'E': {
@@ -228,7 +229,8 @@ void TraceModel::addSystraceEvent(const TraceEvent &te)
                 return;
             }
             ppid = *it;
-            m_processModel->ensureThread(ppid, te.threadName());
+            ThreadModel *tmodel = m_processModel->ensureThread(ppid, te.threadName());
+            tmodel->endDurationSlice();
             break;
         }
         case 'S': {

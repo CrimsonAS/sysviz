@@ -2,6 +2,7 @@
 
 #include "processmodel.h"
 #include "slice.h"
+#include "threadmodel.h"
 
 ProcessModel::ProcessModel(QObject *parent)
     : QAbstractListModel(parent)

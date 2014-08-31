@@ -96,7 +96,7 @@ Window {
                             Repeater {
                                 model: delegate.mytm
                                 delegate: Text{
-                                    text: model.name
+                                    //text: model.name
                                 }
                             }
                         }
