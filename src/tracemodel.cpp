@@ -195,50 +195,55 @@ void TraceModel::addEvent(const TraceEvent &te)
             warned = true;
         }
     } else if (te.eventName() == "tracing_mark_write") {
-        // Events look like:
-        //  TraceEvent(17399 117943.616803 "sailfish-maps" 1 "tracing_mark_write" "B|17399|QSGTR::pAS::lock::graphics")
-
-        pid_t ppid = te.pid();
-        QList<QString> fields = te.details().split('|');
-
-        // the type of systrace event depends on the first character..
-        switch (fields[0][0].toLatin1()) {
-            case 'B':
-                // B|17399|QSGTR::pAS::lock::graphics
-                // B|pid|<stuff>
-                //
-                // starts a slice, ended by E
-                // the 'stuff' is used to describe the event...
-                ppid = fields[1].toLongLong(); // TODO: errcheck
-                m_processModel->ensureThread(ppid, te.threadName());
-                break;
-            case 'E':
-                // E
-                // ends the most recent B slice
-                break;
-            case 'S':
-                // S|17399|QPixmap::loadFromData::graphics|0xbe9d8e20"
-                // S|pid|<stuff>|<uid>
-                //
-                // starts an asynchronous slice.
-                // <stuff> describes the event, <uid> is some unique
-                // string identifying this event so it can be determined
-                // in F
-                break;
-            case 'F':
-                // F|17399|QPixmap::loadFromData::graphics|0xbe9d8e20
-                // same syntactically as S, except ending the event.
-                break;
-            case 'C':
-                // TODO
-                qWarning() << "Unhandled counter slice " << te;
-                break;
-            default:
-                qWarning() << "Unknown systrace type " << te;
-                break;
-        }
+        addSystraceEvent(te);
     } else {
         qWarning() << "Unhandled event: " << te;
+    }
+}
+
+void TraceModel::addSystraceEvent(const TraceEvent &te)
+{
+    // Events look like:
+    //  TraceEvent(17399 117943.616803 "sailfish-maps" 1 "tracing_mark_write" "B|17399|QSGTR::pAS::lock::graphics")
+
+    pid_t ppid = te.pid();
+    QList<QString> fields = te.details().split('|');
+
+    // the type of systrace event depends on the first character..
+    switch (fields[0][0].toLatin1()) {
+        case 'B':
+            // B|17399|QSGTR::pAS::lock::graphics
+            // B|pid|<stuff>
+            //
+            // starts a slice, ended by E
+            // the 'stuff' is used to describe the event...
+            ppid = fields[1].toLongLong(); // TODO: errcheck
+            m_processModel->ensureThread(ppid, te.threadName());
+            break;
+        case 'E':
+            // E
+            // ends the most recent B slice
+            break;
+        case 'S':
+            // S|17399|QPixmap::loadFromData::graphics|0xbe9d8e20"
+            // S|pid|<stuff>|<uid>
+            //
+            // starts an asynchronous slice.
+            // <stuff> describes the event, <uid> is some unique
+            // string identifying this event so it can be determined
+            // in F
+            break;
+        case 'F':
+            // F|17399|QPixmap::loadFromData::graphics|0xbe9d8e20
+            // same syntactically as S, except ending the event.
+            break;
+        case 'C':
+            // TODO
+            qWarning() << "Unhandled counter slice " << te;
+            break;
+        default:
+            qWarning() << "Unknown systrace type " << te;
+            break;
     }
 }
 

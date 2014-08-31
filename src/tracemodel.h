@@ -33,6 +33,9 @@ signals:
     void cpuCountChanged();
 
 private:
+    void addSystraceEvent(const TraceEvent &te);
+
+private:
     TraceTime m_earliestEvent;
     TraceTime m_latestEvent;
     QVector<CpuFrequencyModel *> m_cpuFrequencyModels;
