@@ -22,6 +22,7 @@ CpuFrequencyModel::CpuFrequencyModel(QObject *parent)
     : QAbstractListModel(parent)
     , m_currentSlice(0)
 {
+    qDebug() << "Creating new CPU frequency model";
 }
 
 int CpuFrequencyModel::rowCount(const QModelIndex &parent) const

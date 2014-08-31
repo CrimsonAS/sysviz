@@ -104,7 +104,6 @@ void TraceModel::addEvent(const TraceEvent &te)
         // QMap(("cpu_id", "1")("state", "0"))
         int cpuid = te.parameters()["cpu_id"].toInt(); // TODO: errcheck
         while (cpuid >= m_cpuCStateModels.count()) {
-            qDebug() << "Creating new CPU C-state model";
             m_cpuCStateModels.append(new CpuCStateModel(this));
             emit cpuCountChanged();
         }
@@ -118,7 +117,6 @@ void TraceModel::addEvent(const TraceEvent &te)
         // QMap(("cpu_id", "1")("state", "918000"))
         int cpuid = te.parameters()["cpu_id"].toInt(); // TODO: errcheck
         while (cpuid >= m_cpuFrequencyModels.count()) {
-            qDebug() << "Creating new CPU frequency model";
             m_cpuFrequencyModels.append(new CpuFrequencyModel(this));
             emit cpuCountChanged();
         }
@@ -132,7 +130,6 @@ void TraceModel::addEvent(const TraceEvent &te)
         // QMap(("d_name", "kgsl-3d0")("freq", "450000000")("pwrlevel", "0"))
         // XXX: we're currently only assuming a single GPU. this is not correct.
         if (!m_gpuFrequencyModel) {
-            qDebug() << "Creating GPU frequency model";
             m_gpuFrequencyModel = new GpuFrequencyModel(this);
         }
 

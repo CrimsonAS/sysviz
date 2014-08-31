@@ -22,6 +22,7 @@ CpuCStateModel::CpuCStateModel(QObject *parent)
     : QAbstractListModel(parent)
     , m_currentSlice(0)
 {
+    qDebug() << "Creating new CPU C-state model";
 }
 
 int CpuCStateModel::rowCount(const QModelIndex &parent) const
