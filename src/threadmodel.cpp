@@ -90,12 +90,10 @@ void ThreadModel::addDurationSlice(const TraceTime &time, QString text)
     }
 
     m_currentSliceStack.push(tm);
-    qDebug() << "Begun slice, current stack is " << m_currentSliceStack.count() << " items";
 }
 
 void ThreadModel::endDurationSlice()
 {
-    qDebug() << "Ending slice, current stack is " << m_currentSliceStack.count() << " items";
     if (m_currentSliceStack.count() > 0)
         m_currentSliceStack.pop();
 }
