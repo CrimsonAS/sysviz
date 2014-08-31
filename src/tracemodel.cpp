@@ -202,26 +202,36 @@ void TraceModel::addSystraceEvent(const TraceEvent &te)
 {
     // Events look like:
     //  TraceEvent(17399 117943.616803 "sailfish-maps" 1 "tracing_mark_write" "B|17399|QSGTR::pAS::lock::graphics")
-
+    static QMap<pid_t, pid_t> ppids;
     pid_t ppid = te.pid();
     QList<QString> fields = te.details().split('|');
 
     // the type of systrace event depends on the first character..
     switch (fields[0][0].toLatin1()) {
-        case 'B':
+        case 'B': {
             // B|17399|QSGTR::pAS::lock::graphics
             // B|pid|<stuff>
             //
             // starts a slice, ended by E
             // the 'stuff' is used to describe the event...
             ppid = fields[1].toLongLong(); // TODO: errcheck
+            ppids[te.pid()] = ppid;
             m_processModel->ensureThread(ppid, te.threadName());
             break;
-        case 'E':
+        }
+        case 'E': {
             // E
             // ends the most recent B slice
+            QMap<pid_t, pid_t>::ConstIterator it = ppids.find(te.pid());
+            if (it == ppids.constEnd()) {
+                // no corresponding B
+                return;
+            }
+            ppid = *it;
+            m_processModel->ensureThread(ppid, te.threadName());
             break;
-        case 'S':
+        }
+        case 'S': {
             // S|17399|QPixmap::loadFromData::graphics|0xbe9d8e20"
             // S|pid|<stuff>|<uid>
             //
@@ -230,17 +240,22 @@ void TraceModel::addSystraceEvent(const TraceEvent &te)
             // string identifying this event so it can be determined
             // in F
             break;
-        case 'F':
+        }
+        case 'F': {
             // F|17399|QPixmap::loadFromData::graphics|0xbe9d8e20
             // same syntactically as S, except ending the event.
             break;
-        case 'C':
+        }
+        case 'C': {
             // TODO
             qWarning() << "Unhandled counter slice " << te;
             break;
-        default:
+        }
+        default: {
+            Q_UNREACHABLE();
             qWarning() << "Unknown systrace type " << te;
             break;
+        }
     }
 }
 
