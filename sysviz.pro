@@ -5,6 +5,8 @@ OBJECTS_DIR = .obj
 
 QT += quick
 
+qtHaveModule(dqml):QT += dqml
+
 SOURCES = \
     src/main.cpp \
     src/traceevent.cpp \
@@ -27,3 +29,9 @@ HEADERS = \
 
 CONFIG -= app_bundle
 CONFIG += c++11
+
+OTHER_FILES += \
+    qml/main.qml \
+    qml/CpuFrequencyView.qml \
+    qml/theme.js \
+    qml/RowGradient.qml

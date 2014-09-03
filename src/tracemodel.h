@@ -16,12 +16,16 @@ class TraceModel : public QObject
 {
     Q_OBJECT
 public:
+
     TraceModel();
     void initFromFile(QFile *f);
     void addEvent(const TraceEvent &te);
 
-    Q_PROPERTY(int cpuCount READ cpuCount NOTIFY cpuCountChanged);
+    Q_PROPERTY(int cpuCount READ cpuCount NOTIFY cpuCountChanged)
     int cpuCount() const;
+
+    Q_PROPERTY(double traceLength READ traceLength NOTIFY traceLengthChanged)
+    double traceLength() const { return (m_latestEvent - m_earliestEvent).toDouble(); }
 
     Q_INVOKABLE CpuFrequencyModel *cpuFrequencyModel(int cpu) const;
     Q_INVOKABLE CpuCStateModel *cpuCStateModel(int cpu) const;
@@ -31,6 +35,7 @@ public:
 
 signals:
     void cpuCountChanged();
+    void traceLengthChanged();
 
 private:
     void addSystraceEvent(const TraceEvent &te);
