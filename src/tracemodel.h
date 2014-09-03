@@ -24,6 +24,12 @@ public:
     Q_PROPERTY(int cpuCount READ cpuCount NOTIFY cpuCountChanged)
     int cpuCount() const;
 
+    Q_PROPERTY(int maxCpuFrequency READ maxCpuFrequency NOTIFY maxCpuFrequencyChanged)
+    int maxCpuFrequency() const;
+
+    Q_PROPERTY(int maxGpuFrequency READ maxGpuFrequency NOTIFY maxGpuFrequencyChanged)
+    int maxGpuFrequency() const;
+
     Q_PROPERTY(double traceLength READ traceLength NOTIFY traceLengthChanged)
     double traceLength() const { return (m_latestEvent - m_earliestEvent).toDouble(); }
 
@@ -36,6 +42,8 @@ public:
 signals:
     void cpuCountChanged();
     void traceLengthChanged();
+    void maxCpuFrequencyChanged();
+    void maxGpuFrequencyChanged();
 
 private:
     void addSystraceEvent(const TraceEvent &te);
@@ -47,6 +55,8 @@ private:
     QVector<CpuCStateModel *> m_cpuCStateModels;
     GpuFrequencyModel *m_gpuFrequencyModel;
     ProcessModel *m_processModel;
+    int m_maxCpuFrequency;
+    int m_maxGpuFrequency;
 };
 
 #endif // TRACEMODEL_H
