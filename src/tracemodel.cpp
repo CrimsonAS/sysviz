@@ -16,6 +16,8 @@
 TraceModel::TraceModel()
     : m_gpuFrequencyModel(0)
     , m_processModel(new ProcessModel(this))
+    , m_maxCpuFrequency(0)
+    , m_maxGpuFrequency(0)
 {
     qmlRegisterType<CpuFrequencyModel>();
     qmlRegisterType<CpuCStateModel>();
@@ -121,7 +123,14 @@ void TraceModel::addEvent(const TraceEvent &te)
             emit cpuCountChanged();
         }
 
-        m_cpuFrequencyModels.at(cpuid)->changeFrequency(te.timestamp() - m_earliestEvent, te.parameters()["state"].toInt() /* TODO: errcheck */);
+        int freq = te.parameters()["state"].toInt(); /* TODO: errcheck */
+        if (freq > m_maxCpuFrequency) {
+            qDebug() << "New top CPU frequency " << freq << " seen on CPU ID " << cpuid;
+            m_maxCpuFrequency = freq;
+            emit maxCpuFrequencyChanged();
+        }
+
+        m_cpuFrequencyModels.at(cpuid)->changeFrequency(te.timestamp() - m_earliestEvent, freq);
     } else if (te.eventName() == "kgsl_pwrlevel") {
         // Events look like:
         // TraceEvent(15024 117918.600719 "kworker/u:2" 0 "kgsl_pwrlevel" "d_name=kgsl-3d0 pwrlevel=0 freq=450000000")
@@ -136,6 +145,13 @@ void TraceModel::addEvent(const TraceEvent &te)
         // TODO: what does the 'pwrlevel' mean?
         int khz = te.parameters()["freq"].toInt(); /* TODO: errcheck */
         khz = khz / 1000;
+
+        if (khz > m_maxGpuFrequency) {
+            qDebug() << "New top GPU frequency: " << khz;
+            m_maxGpuFrequency = khz;
+            emit maxGpuFrequencyChanged();
+        }
+
         m_gpuFrequencyModel->changeFrequency(te.timestamp() - m_earliestEvent, khz);
     } else if (te.eventName() == "block_rq_issue") {
         // TODO: parse later
@@ -295,6 +311,16 @@ GpuFrequencyModel *TraceModel::gpuFrequencyModel() const
 ProcessModel *TraceModel::processModel() const
 {
     return m_processModel;
+}
+
+int TraceModel::maxCpuFrequency() const
+{
+    return m_maxCpuFrequency;
+}
+
+int TraceModel::maxGpuFrequency() const
+{
+    return m_maxGpuFrequency;
 }
 
 // Thoughts about how to present this...
