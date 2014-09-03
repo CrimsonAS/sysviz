@@ -7,11 +7,11 @@ RowGradient {
     height: 50
 
     property QtObject model;
-    property string label;
 
     property real padding: 2
     property real pps: 1000;
 
+    property real maxFrequency: 1404000
 
     Repeater {
         id: repeater
@@ -24,7 +24,7 @@ RowGradient {
             x: startTime * root.pps
             width: (endTime - startTime) * root.pps
 
-            property real hz: frequency / 1404000;
+            property real hz: frequency / root.maxFrequency
 
             y: (root.height - padding) - height
             height: hz * (root.height - padding * 2);
@@ -32,8 +32,6 @@ RowGradient {
             color: Qt.hsla((1 - hz) * 0.33, 1, 0.5, 0.5);
 
             antialiasing: true
-
-
 
 //            Text {
 //                color: "white"
