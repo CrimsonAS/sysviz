@@ -43,14 +43,10 @@ QVariant CpuFrequencyModel::data(const QModelIndex &index, int role) const
     {
         case CpuFrequencyModel::FrequencyRole:
             return m_slices.at(index.row())->frequency();
-        case CpuFrequencyModel::StartSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->startTime().tv_sec;
-        case CpuFrequencyModel::StartMicroSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->startTime().tv_usec;
-        case CpuFrequencyModel::EndSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->endTime().tv_sec;
-        case CpuFrequencyModel::EndMicroSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->endTime().tv_usec;
+        case CpuFrequencyModel::StartTimeRole:
+            return m_slices.at(index.row())->startTime().toDouble();
+        case CpuFrequencyModel::EndTimeRole:
+            return m_slices.at(index.row())->endTime().toDouble();
     }
 
     Q_UNREACHABLE();
@@ -61,10 +57,8 @@ QHash<int, QByteArray> CpuFrequencyModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[CpuFrequencyModel::FrequencyRole] = "frequency";
-    roles[CpuFrequencyModel::StartSecondsRole] = "startSeconds";
-    roles[CpuFrequencyModel::StartMicroSecondsRole] = "startMicroSeconds";
-    roles[CpuFrequencyModel::EndSecondsRole] = "endSeconds";
-    roles[CpuFrequencyModel::EndMicroSecondsRole] = "endMicroSeconds";
+    roles[CpuFrequencyModel::StartTimeRole] = "startTime";
+    roles[CpuFrequencyModel::EndTimeRole] = "endTime";
     return roles;
 }
 

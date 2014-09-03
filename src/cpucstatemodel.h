@@ -15,10 +15,8 @@ public:
 
     enum ModelRoles {
         CStateRole = Qt::UserRole,
-        StartSecondsRole,
-        StartMicroSecondsRole,
-        EndSecondsRole,
-        EndMicroSecondsRole
+        StartTimeRole,
+        EndTimeRole
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;

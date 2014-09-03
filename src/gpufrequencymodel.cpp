@@ -36,14 +36,10 @@ QVariant GpuFrequencyModel::data(const QModelIndex &index, int role) const
     {
         case GpuFrequencyModel::FrequencyRole:
             return m_slices.at(index.row())->frequency();
-        case GpuFrequencyModel::StartSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->startTime().tv_sec;
-        case GpuFrequencyModel::StartMicroSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->startTime().tv_usec;
-        case GpuFrequencyModel::EndSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->endTime().tv_sec;
-        case GpuFrequencyModel::EndMicroSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->endTime().tv_usec;
+        case GpuFrequencyModel::StartTimeRole:
+            return m_slices.at(index.row())->startTime().toDouble();
+        case GpuFrequencyModel::EndTimeRole:
+            return m_slices.at(index.row())->endTime().toDouble();
     }
 
     Q_UNREACHABLE();
@@ -54,10 +50,8 @@ QHash<int, QByteArray> GpuFrequencyModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[GpuFrequencyModel::FrequencyRole] = "frequency";
-    roles[GpuFrequencyModel::StartSecondsRole] = "startSeconds";
-    roles[GpuFrequencyModel::StartMicroSecondsRole] = "startMicroSeconds";
-    roles[GpuFrequencyModel::EndSecondsRole] = "endSeconds";
-    roles[GpuFrequencyModel::EndMicroSecondsRole] = "endMicroSeconds";
+    roles[GpuFrequencyModel::StartTimeRole] = "startTime";
+    roles[GpuFrequencyModel::EndTimeRole] = "endTime";
     return roles;
 }
 

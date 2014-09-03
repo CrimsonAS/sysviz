@@ -6,7 +6,14 @@ struct TraceTime
 {
     long tv_sec;
     qlonglong tv_usec;
+
+    double toDouble() const;
 };
+
+inline double TraceTime::toDouble() const
+{
+    return tv_sec + (tv_usec / 1000000.);
+}
 
 inline TraceTime operator+(const TraceTime &a, const TraceTime &b)
 {
