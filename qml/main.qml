@@ -76,7 +76,7 @@ Rectangle {
         id: labels
 
         anchors.top: header.bottom
-        width: 2 * cm
+        width: 3 * cm // TODO: we need a way to fit this better perhaps.. and/or maybe offer a splitter to resize?
         height: flickable.height
 
         contentY: flickable.contentY
@@ -98,6 +98,20 @@ Rectangle {
                     height: root.rowHeight
                     width: parent.width
                     text: "Frequency:\nCPU " + index;
+                }
+            }
+
+            Repeater {
+                model: traceModel.threadCount
+                ViewLabel {
+                    property var tm: traceModel.threadModel(index)
+                    height: Math.max(root.rowHeight, 10 * tm.maxStackDepth)
+                    width: parent.width
+                    text: "PID: " + tm.pid + "\n" + tm.threadName
+
+                    Component.onCompleted: {
+                        console.log(tm)
+                    }
                 }
             }
         }
@@ -151,7 +165,17 @@ Rectangle {
                 }
             }
 
+            Repeater {
+                id: threadRepeater
+                model: traceModel.threadCount
 
+                ThreadView {
+                    model: traceModel.threadModel(index)
+                    width: flickable.contentWidth
+                    height: Math.max(root.rowHeight, 10 * model.maxStackDepth) // TODO: would be nice to sync these up with the headers so we didn't have to specify them twice
+                    pps: header.pps
+                }
+            }
         }
 
     }
