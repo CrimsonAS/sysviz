@@ -44,19 +44,6 @@ TraceModel::TraceModel()
     }
 
     initFromFile(&f);
-
-    qDebug() << "Model represents " << cpuCount() << " CPUs";
-
-    for (int i = 0; i < cpuCount(); ++i)
-        qDebug() << "Frequency model for CPU ID " << i << " has " << cpuFrequencyModel(i)->rowCount(QModelIndex()) << " slices";
-    for (int i = 0; i < cpuCount(); ++i)
-        qDebug() << "C-state model for CPU ID " << i << " has " << cpuCStateModel(i)->rowCount(QModelIndex()) << " slices";
-    qDebug() << "GPU frequency model has " << gpuFrequencyModel()->rowCount(QModelIndex()) << " slices";
-    qDebug() << "Process model has " << m_processModel->rowCount(QModelIndex()) << " threads";
-    for (int i = 0; i < m_processModel->rowCount(QModelIndex()); ++i) {
-        ThreadModel *tm = qvariant_cast<ThreadModel *>(m_processModel->data(m_processModel->index(i, 0), ProcessModel::ThreadModelRole));
-        qDebug() << "Thread " << tm->threadName() << " for PID " << tm->pid() << " has " << tm->rowCount(QModelIndex()) << " slices";
-    }
 }
 
 void TraceModel::initFromFile(QFile *f)
@@ -73,6 +60,19 @@ void TraceModel::initFromFile(QFile *f)
     qDebug() << "File processed in " << fileTimer.elapsed();
     qDebug().nospace() << "Earliest event: " << m_earliestEvent.tv_sec << "." << m_earliestEvent.tv_usec;
     qDebug().nospace() << "Latest event: " << m_latestEvent.tv_sec << "." << m_latestEvent.tv_usec;
+
+    qDebug() << "Model represents " << cpuCount() << " CPUs";
+
+    for (int i = 0; i < cpuCount(); ++i)
+        qDebug() << "Frequency model for CPU ID " << i << " has " << cpuFrequencyModel(i)->rowCount(QModelIndex()) << " slices";
+    for (int i = 0; i < cpuCount(); ++i)
+        qDebug() << "C-state model for CPU ID " << i << " has " << cpuCStateModel(i)->rowCount(QModelIndex()) << " slices";
+    qDebug() << "GPU frequency model has " << gpuFrequencyModel()->rowCount(QModelIndex()) << " slices";
+    qDebug() << "Process model has " << m_processModel->rowCount(QModelIndex()) << " threads";
+    for (int i = 0; i < m_processModel->rowCount(QModelIndex()); ++i) {
+        ThreadModel *tm = qvariant_cast<ThreadModel *>(m_processModel->data(m_processModel->index(i, 0), ProcessModel::ThreadModelRole));
+        qDebug() << "Thread " << tm->threadName() << " for PID " << tm->pid() << " has " << tm->rowCount(QModelIndex()) << " slices";
+    }
 }
 
 void TraceModel::addEvent(const TraceEvent &te)
