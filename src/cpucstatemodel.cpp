@@ -43,14 +43,10 @@ QVariant CpuCStateModel::data(const QModelIndex &index, int role) const
     {
         case CpuCStateModel::CStateRole:
             return m_slices.at(index.row())->cstate();
-        case CpuCStateModel::StartSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->startTime().tv_sec;
-        case CpuCStateModel::StartMicroSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->startTime().tv_usec;
-        case CpuCStateModel::EndSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->endTime().tv_sec;
-        case CpuCStateModel::EndMicroSecondsRole:
-            return (qlonglong)m_slices.at(index.row())->endTime().tv_usec;
+        case CpuCStateModel::StartTimeRole:
+            return m_slices.at(index.row())->startTime().toDouble();
+        case CpuCStateModel::EndTimeRole:
+            return m_slices.at(index.row())->endTime().toDouble();
     }
 
     Q_UNREACHABLE();
@@ -61,10 +57,8 @@ QHash<int, QByteArray> CpuCStateModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[CpuCStateModel::CStateRole] = "cstate";
-    roles[CpuCStateModel::StartSecondsRole] = "startSeconds";
-    roles[CpuCStateModel::StartMicroSecondsRole] = "startMicroSeconds";
-    roles[CpuCStateModel::EndSecondsRole] = "endSeconds";
-    roles[CpuCStateModel::EndMicroSecondsRole] = "endMicroSeconds";
+    roles[CpuCStateModel::StartTimeRole] = "startTime";
+    roles[CpuCStateModel::EndTimeRole] = "endTime";
     return roles;
 }
 

@@ -54,14 +54,10 @@ QVariant ThreadModel::data(const QModelIndex &index, int role) const
         // TODO: do any of these roles really make sense? maybe it makes more
         // sense to expose a list of the top level slices (QObject* only) and
         // get all properties off them
-        case ThreadModel::StartSecondsRole:
-            return (qlonglong)m_topLevelSlices.at(index.row())->startTime().tv_sec;
-        case ThreadModel::StartMicroSecondsRole:
-            return (qlonglong)m_topLevelSlices.at(index.row())->startTime().tv_usec;
-        case ThreadModel::EndSecondsRole:
-            return (qlonglong)m_topLevelSlices.at(index.row())->endTime().tv_sec;
-        case ThreadModel::EndMicroSecondsRole:
-            return (qlonglong)m_topLevelSlices.at(index.row())->endTime().tv_usec;
+        case ThreadModel::StartTimeRole:
+            return m_topLevelSlices.at(index.row())->startTime().toDouble();
+        case ThreadModel::EndTimeRole:
+            return m_topLevelSlices.at(index.row())->endTime().toDouble();
     }
 
     Q_UNREACHABLE();
@@ -71,10 +67,8 @@ QVariant ThreadModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> ThreadModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[ThreadModel::StartSecondsRole] = "startSeconds";
-    roles[ThreadModel::StartMicroSecondsRole] = "startMicroSeconds";
-    roles[ThreadModel::EndSecondsRole] = "endSeconds";
-    roles[ThreadModel::EndMicroSecondsRole] = "endMicroSeconds";
+    roles[ThreadModel::StartTimeRole] = "startTime";
+    roles[ThreadModel::EndTimeRole] = "endTime";
     return roles;
 }
 
