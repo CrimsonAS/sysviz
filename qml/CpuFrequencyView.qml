@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-Rectangle {
+RowGradient {
     id: root
 
     width: 100
@@ -9,11 +9,9 @@ Rectangle {
     property QtObject model;
     property string label;
 
-    gradient: Gradient {
-        GradientStop { position: 0; color: Qt.hsla(0, 0, 0.9); }
-        GradientStop { position: 1 - 1 / root.height ; color: Qt.hsla(0, 0, 0.6); }
-        GradientStop { position: 1; color: Qt.hsla(0, 0, 0.4); }
-    }
+    property real padding: 2
+    property real pps: 1000;
+
 
     Repeater {
         id: repeater
@@ -21,20 +19,20 @@ Rectangle {
 
         Rectangle {
 
-            property real t0: startSeconds * 1000 + startMicroSeconds / 1000;
-            property real t1: endSeconds * 1000 + endMicroSeconds / 1000;
+            property real t0: startSeconds + startMicroSeconds / 1000000;
+            property real t1: endSeconds + endMicroSeconds / 1000000;
 
-            Component.onCompleted: print(root.label + ": " + t0 + " -> " + t1 + " -- " + frequency)
+            radius: 3
 
-            x: t0 * 0.5
-            width: (t1 - t0) * 0.5
+            x: t0 * root.pps
+            width: (t1 - t0) * root.pps
 
             property real hz: frequency / 1404000;
 
-            y: root.height - hz * root.height;
-            height: root.height * hz
+            y: (root.height - padding) - height
+            height: hz * (root.height - padding * 2);
 
-            color: Qt.hsla((1 - hz) * 0.33, 1, 0.5, 0.66);
+            color: Qt.hsla((1 - hz) * 0.33, 1, 0.5, 0.5);
 
             antialiasing: true
 

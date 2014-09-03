@@ -6,6 +6,7 @@
 #include <QtQml>
 
 #include <QQuickView>
+#include <QScreen>
 
 #include "tracemodel.h"
 
@@ -23,12 +24,11 @@ int main(int argc, char **argv)
     QQuickView view;
 
     view.rootContext()->setContextProperty("traceModel", &model);
+    view.rootContext()->setContextProperty("cm", view.screen()->physicalDotsPerInch() / 2.54);
 
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl::fromLocalFile("qml/main.qml"));
     view.show();
-
-
 
 #ifdef QT_DQML_LIB
     DQmlLocalServer server(view.engine(), &view, "qml/main.qml");

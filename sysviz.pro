@@ -32,4 +32,6 @@ CONFIG += c++11
 
 OTHER_FILES += \
     qml/main.qml \
-    qml/CpuFrequencyView.qml
+    qml/CpuFrequencyView.qml \
+    qml/theme.js \
+    qml/RowGradient.qml
