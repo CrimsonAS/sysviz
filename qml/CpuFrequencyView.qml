@@ -19,13 +19,10 @@ RowGradient {
 
         Rectangle {
 
-            property real t0: startSeconds + startMicroSeconds / 1000000;
-            property real t1: endSeconds + endMicroSeconds / 1000000;
-
             radius: 3
 
-            x: t0 * root.pps
-            width: (t1 - t0) * root.pps
+            x: startTime * root.pps
+            width: (endTime - startTime) * root.pps
 
             property real hz: frequency / 1404000;
 

@@ -64,7 +64,7 @@ Rectangle {
 //        NumberAnimation on contentX { from: 0; to: 500; duration: 2000; loops: Animation.Infinite }
 
         contentHeight: cm * cpuFrequencyRepeater.count;
-        contentWidth: 10000
+        contentWidth: traceModel.traceLength * header.pps;
 
         flickableDirection: Flickable.HorizontalFlick
 //        draggingVertically: false
