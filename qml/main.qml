@@ -9,17 +9,19 @@ Rectangle {
     width: 800;
     height: 600;
 
-    visible: true
+    property var rowHeight: 1 * cm;
 
     RowGradient {
         id: header
 
-        width: parent.width
-
+        anchors.left: labels.right
+        anchors.right: parent.right
         height: Math.floor(0.5 * cm);
 
+        clip: true
+
         // Pixels per millisecond, a kinda of zoom ratio
-        property real pps: 100;
+        property real pps: 200;
 
 //        NumberAnimation on pps { from: 100; to: 1000; duration: 10000; loops: Animation.Infinite }
 
@@ -50,48 +52,95 @@ Rectangle {
                 }
             }
         }
+    }
 
+    Flickable {
+        id: labels
+
+        anchors.top: header.bottom
+        width: 2 * cm
+        height: flickable.height
+
+        contentY: flickable.contentY
+
+        clip: true
+
+        Column {
+            width: parent.width
+
+            ViewLabel {
+                height: root.rowHeight
+                width: parent.width
+                text: "Frequency:\nGPU"
+            }
+
+            Repeater {
+                model: traceModel.cpuCount
+                ViewLabel {
+                    height: root.rowHeight
+                    width: parent.width
+                    text: "Frequency:\nCPU " + index;
+                }
+            }
+        }
     }
 
     Flickable {
         id: flickable
 
-        anchors.left: parent.left
+        anchors.left: labels.right
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.top: header.bottom
+        clip: true
 
 //        NumberAnimation on contentX { from: 0; to: 500; duration: 2000; loops: Animation.Infinite }
 
         contentHeight: cm * cpuFrequencyRepeater.count;
         contentWidth: traceModel.traceLength * header.pps;
 
-        flickableDirection: Flickable.HorizontalFlick
+//        flickableDirection: Flickable.HorizontalFlick
 //        draggingVertically: false
 //        draggingHorizontally: true
 
         Column {
 //            height: 2 * cm
+
+//            GpuFrequencyView {
+//                model: traceModel.gpuFrequencyModel();
+//                width: flickable.contentWidth;
+//                height: Math.floor(1 * cm);
+//                pps: header.pps;
+//            }
+
+            FrequencyView {
+                model: traceModel.gpuFrequencyModel();
+                width: flickable.contentWidth;
+                height: Math.floor(1 * cm);
+                pps: header.pps;
+                maxFrequency: traceModel.maxGpuFrequency
+            }
+
             Repeater {
                 id: cpuFrequencyRepeater
                 model: traceModel.cpuCount
-                CpuFrequencyView {
-                    id: cpuFrequencyView
+                FrequencyView {
                     model: traceModel.cpuFrequencyModel(index);
-                    width: 10000
-                    label: "CPU Frequency " + index;
+                    width: flickable.contentWidth;
                     height: Math.floor(1 * cm);
                     pps: header.pps;
+                    maxFrequency: traceModel.maxCpuFrequency
                 }
             }
+
+
         }
 
     }
 
-
     gradient: Gradient {
-        GradientStop { position: 0; color: Qt.hsla(0.66, 0.2, 0.9); }
-        GradientStop { position: 1; color: Qt.hsla(0, 0, 0.5); }
+        GradientStop { position: 0; color: Qt.hsla(0.66, 0.2, 0.4); }
+        GradientStop { position: 1; color: Qt.hsla(0, 0, 0.2); }
     }
 
 }
