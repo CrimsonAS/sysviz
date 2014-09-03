@@ -22,6 +22,24 @@ Rectangle {
 
         // Pixels per millisecond, a kinda of zoom ratio
         property real pps: 200;
+        focus: true
+
+        Keys.onPressed: {
+            // TODO: is the zoom in/out behaviour optimal? right now it changes
+            // contentX by the same factor, but maybe we want to keep the view
+            // centered?
+            if (event.key == Qt.Key_Up) {
+                pps *= 1.1
+                flickable.contentX *= 1.1
+            } else if (event.key == Qt.Key_Down) {
+                pps *= 0.9
+                flickable.contentX *= 0.9
+            } else if (event.key == Qt.Key_Left) {
+                flickable.contentX -= 100
+            } else if (event.key == Qt.Key_Right) {
+                flickable.contentX += 100
+            }
+        }
 
 //        NumberAnimation on pps { from: 100; to: 1000; duration: 10000; loops: Animation.Infinite }
 
