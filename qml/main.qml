@@ -28,15 +28,15 @@ Rectangle {
             // TODO: is the zoom in/out behaviour optimal? right now it changes
             // contentX by the same factor, but maybe we want to keep the view
             // centered?
-            if (event.key == Qt.Key_Up) {
+            if (event.key == Qt.Key_Up || event.key == Qt.Key_W) {
                 pps *= 1.1
                 flickable.contentX *= 1.1
-            } else if (event.key == Qt.Key_Down) {
+            } else if (event.key == Qt.Key_Down || event.key == Qt.Key_S) {
                 pps *= 0.9
                 flickable.contentX *= 0.9
-            } else if (event.key == Qt.Key_Left) {
+            } else if (event.key == Qt.Key_Left || event.key == Qt.Key_A) {
                 flickable.contentX -= 100
-            } else if (event.key == Qt.Key_Right) {
+            } else if (event.key == Qt.Key_Right || event.key == Qt.Key_D) {
                 flickable.contentX += 100
             }
         }
