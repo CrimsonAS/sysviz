@@ -118,7 +118,7 @@ Rectangle {
                 width: flickable.contentWidth;
                 height: Math.floor(1 * cm);
                 pps: header.pps;
-                maxFrequency: 450000000;
+                maxFrequency: traceModel.maxGpuFrequency
             }
 
             Repeater {
@@ -129,6 +129,7 @@ Rectangle {
                     width: flickable.contentWidth;
                     height: Math.floor(1 * cm);
                     pps: header.pps;
+                    maxFrequency: traceModel.maxCpuFrequency
                 }
             }
 
