@@ -134,7 +134,9 @@ void TraceModel::addEvent(const TraceEvent &te)
         }
 
         // TODO: what does the 'pwrlevel' mean?
-        m_gpuFrequencyModel->changeFrequency(te.timestamp() - m_earliestEvent, te.parameters()["freq"].toInt() /* TODO: errcheck */);
+        int khz = te.parameters()["freq"].toInt(); /* TODO: errcheck */
+        khz = khz / 1000;
+        m_gpuFrequencyModel->changeFrequency(te.timestamp() - m_earliestEvent, khz);
     } else if (te.eventName() == "block_rq_issue") {
         // TODO: parse later
         static bool warned = false;
