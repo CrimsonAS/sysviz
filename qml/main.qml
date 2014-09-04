@@ -136,15 +136,6 @@ Rectangle {
 //        draggingHorizontally: true
 
         Column {
-//            height: 2 * cm
-
-//            GpuFrequencyView {
-//                model: traceModel.gpuFrequencyModel();
-//                width: flickable.contentWidth;
-//                height: Math.floor(1 * cm);
-//                pps: header.pps;
-//            }
-
             FrequencyView {
                 model: traceModel.gpuFrequencyModel();
                 width: flickable.contentWidth;
