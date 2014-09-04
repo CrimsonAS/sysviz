@@ -39,7 +39,13 @@ TraceModel::TraceModel()
     m_latestEvent.tv_usec = std::numeric_limits<long>::min();
 #endif
 
-    QFile f("data/trace.systrace");
+    QByteArray fileName = qgetenv("SYSVIZ_FILE");
+    if (fileName.isEmpty())
+        fileName = "data/trace.systrace";
+
+    qDebug() << "Reading " << fileName;
+
+    QFile f(fileName);
     if (!f.open(QIODevice::ReadOnly)) {
         qWarning("Can't open trace");
         return;
