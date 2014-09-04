@@ -5,7 +5,10 @@ OBJECTS_DIR = .obj
 
 QT += quick
 
-qtHaveModule(dqml):QT += dqml
+!nodqml:qtHaveModule(dqml):{
+    message("Building with DQml support...")
+    QT += dqml
+}
 
 SOURCES = \
     src/main.cpp \

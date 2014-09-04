@@ -33,7 +33,6 @@ int main(int argc, char **argv)
 #ifdef QT_DQML_LIB
     DQmlLocalServer server(view.engine(), &view, "qml/main.qml");
     server.fileTracker()->track("qml", "qml");
-    server.reloadQml();
 #endif
 
     app.exec();
