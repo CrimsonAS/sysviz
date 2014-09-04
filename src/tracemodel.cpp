@@ -45,18 +45,16 @@ TraceModel::TraceModel()
         return;
     }
 
-    initFromFile(&f);
-}
-
-void TraceModel::initFromFile(QFile *f)
-{
     QElapsedTimer fileTimer;
     fileTimer.start();
 
-    while (!f->atEnd()) {
-        QByteArray line = f->readLine();
-        TraceEvent te = TraceEvent::fromString(line);
-        addEvent(te);
+    QFileInfo fi(f);
+    if (fi.fileName().endsWith(".html")) {
+        // it's a systrace output file
+        initFromSystrace(&f);
+    } else {
+        // raw data
+        initFromFile(&f);
     }
 
     qDebug() << "File processed in " << fileTimer.elapsed();
@@ -74,6 +72,38 @@ void TraceModel::initFromFile(QFile *f)
     for (int i = 0; i < m_threadModels.count(); ++i) {
         ThreadModel *tm = m_threadModels.at(i);
         qDebug() << "Thread " << tm->threadName() << " for PID " << tm->pid() << " has " << tm->rowCount(QModelIndex()) << " slices";
+    }
+}
+
+void TraceModel::initFromFile(QFile *f)
+{
+    while (!f->atEnd()) {
+        QByteArray line = f->readLine();
+        TraceEvent te = TraceEvent::fromString(line);
+        addEvent(te);
+    }
+}
+
+void TraceModel::initFromSystrace(QFile *f)
+{
+    QByteArray data = f->readAll(); // yes, ew
+    QRegularExpression re("\\s+<script>\\n\\s+var linuxPerfData = \"(.+)\";", QRegularExpression::DotMatchesEverythingOption);
+    qWarning() << re.errorString();
+    QRegularExpressionMatch m = re.match(data);
+    if (!m.hasMatch()) {
+        qWarning() << "Not a systrace file?";
+        return;
+    }
+
+    QStringList traceLines = m.captured(1).split("\n");
+    foreach (const QString &line, traceLines) {
+        if (line.endsWith("\\n\\")) { // trim useless garbage
+            TraceEvent te = TraceEvent::fromString(line.left(line.length() - 3).toLatin1());
+            addEvent(te);
+        } else {
+            TraceEvent te = TraceEvent::fromString(line.toLatin1());
+            addEvent(te);
+        }
     }
 }
 
