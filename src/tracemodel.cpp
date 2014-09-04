@@ -155,7 +155,7 @@ void TraceModel::addEvent(const TraceEvent &te)
         m_gpuFrequencyModel->changeFrequency(te.timestamp() - m_earliestEvent, khz);
     } else if (te.eventName() == "block_rq_issue") {
         int evcount = ioTrafficModel()->recordIOStart(te.timestamp() - m_earliestEvent);
-        if (evcount >= m_maxIOTraffic) {
+        if (evcount > m_maxIOTraffic) {
             qDebug() << "New top IO event count: " << evcount;
             m_maxIOTraffic = evcount;
             emit maxIOTrafficChanged();
