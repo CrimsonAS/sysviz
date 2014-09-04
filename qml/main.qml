@@ -28,15 +28,15 @@ Rectangle {
             // TODO: is the zoom in/out behaviour optimal? right now it changes
             // contentX by the same factor, but maybe we want to keep the view
             // centered?
-            if (event.key == Qt.Key_Up) {
+            if (event.key == Qt.Key_Up || event.key == Qt.Key_W) {
                 pps *= 1.1
                 flickable.contentX *= 1.1
-            } else if (event.key == Qt.Key_Down) {
+            } else if (event.key == Qt.Key_Down || event.key == Qt.Key_S) {
                 pps *= 0.9
                 flickable.contentX *= 0.9
-            } else if (event.key == Qt.Key_Left) {
+            } else if (event.key == Qt.Key_Left || event.key == Qt.Key_A) {
                 flickable.contentX -= 100
-            } else if (event.key == Qt.Key_Right) {
+            } else if (event.key == Qt.Key_Right || event.key == Qt.Key_D) {
                 flickable.contentX += 100
             }
         }
@@ -76,7 +76,7 @@ Rectangle {
         id: labels
 
         anchors.top: header.bottom
-        width: 2 * cm
+        width: 3 * cm // TODO: we need a way to fit this better perhaps.. and/or maybe offer a splitter to resize?
         height: flickable.height
 
         contentY: flickable.contentY
@@ -98,6 +98,20 @@ Rectangle {
                     height: root.rowHeight
                     width: parent.width
                     text: "Frequency:\nCPU " + index;
+                }
+            }
+
+            Repeater {
+                model: traceModel.threadCount
+                ViewLabel {
+                    property var tm: traceModel.threadModel(index)
+                    height: Math.max(root.rowHeight, 10 * tm.maxStackDepth)
+                    width: parent.width
+                    text: "PID: " + tm.pid + "\n" + tm.threadName
+
+                    Component.onCompleted: {
+                        console.log(tm)
+                    }
                 }
             }
         }
@@ -151,7 +165,17 @@ Rectangle {
                 }
             }
 
+            Repeater {
+                id: threadRepeater
+                model: traceModel.threadCount
 
+                ThreadView {
+                    model: traceModel.threadModel(index)
+                    width: flickable.contentWidth
+                    height: Math.max(root.rowHeight, 10 * model.maxStackDepth) // TODO: would be nice to sync these up with the headers so we didn't have to specify them twice
+                    pps: header.pps
+                }
+            }
         }
 
     }

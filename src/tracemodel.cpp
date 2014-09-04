@@ -8,21 +8,18 @@
 #include "cpucstatemodel.h"
 #include "cpufrequencymodel.h"
 #include "gpufrequencymodel.h"
-#include "processmodel.h"
 #include "threadmodel.h"
 
 #include <sys/time.h>
 
 TraceModel::TraceModel()
     : m_gpuFrequencyModel(0)
-    , m_processModel(new ProcessModel(this))
     , m_maxCpuFrequency(0)
     , m_maxGpuFrequency(0)
 {
     qmlRegisterType<CpuFrequencyModel>();
     qmlRegisterType<CpuCStateModel>();
     qmlRegisterType<GpuFrequencyModel>();
-    qmlRegisterType<ProcessModel>();
     qmlRegisterType<ThreadModel>();
 
     m_earliestEvent.tv_sec = std::numeric_limits<long>::max();
@@ -70,9 +67,9 @@ void TraceModel::initFromFile(QFile *f)
     for (int i = 0; i < cpuCount(); ++i)
         qDebug() << "C-state model for CPU ID " << i << " has " << cpuCStateModel(i)->rowCount(QModelIndex()) << " slices";
     qDebug() << "GPU frequency model has " << gpuFrequencyModel()->rowCount(QModelIndex()) << " slices";
-    qDebug() << "Process model has " << m_processModel->rowCount(QModelIndex()) << " threads";
-    for (int i = 0; i < m_processModel->rowCount(QModelIndex()); ++i) {
-        ThreadModel *tm = qvariant_cast<ThreadModel *>(m_processModel->data(m_processModel->index(i, 0), ProcessModel::ThreadModelRole));
+    qDebug() << "We know about " << m_threadModels.count() << " threads";
+    for (int i = 0; i < m_threadModels.count(); ++i) {
+        ThreadModel *tm = m_threadModels.at(i);
         qDebug() << "Thread " << tm->threadName() << " for PID " << tm->pid() << " has " << tm->rowCount(QModelIndex()) << " slices";
     }
 }
@@ -216,6 +213,21 @@ void TraceModel::addEvent(const TraceEvent &te)
     }
 }
 
+ThreadModel *TraceModel::ensureThread(qlonglong pid, const QString &threadName)
+{
+    for (int i = 0; i < m_threadModels.count(); ++i) {
+        ThreadModel *tm = m_threadModels.at(i);
+        if (tm->pid() == pid && tm->threadName() == threadName)
+            return tm;
+    }
+
+    qDebug() << "Creating thread model for " << threadName << " on pid " << pid;
+    // TODO: threads should be grouped by process on insertion
+    m_threadModels.append(new ThreadModel(this, pid, threadName));
+    emit threadCountChanged();
+    return m_threadModels.last();
+}
+
 void TraceModel::addSystraceEvent(const TraceEvent &te)
 {
     // Events look like:
@@ -234,7 +246,7 @@ void TraceModel::addSystraceEvent(const TraceEvent &te)
             // the 'stuff' is used to describe the event...
             ppid = fields[1].toLongLong(); // TODO: errcheck
             ppids[te.pid()] = ppid;
-            ThreadModel *tmodel = m_processModel->ensureThread(ppid, te.threadName());
+            ThreadModel *tmodel = ensureThread(ppid, te.threadName());
             tmodel->addDurationSlice(te.timestamp() - m_earliestEvent, fields[2]); // TODO: fields[2] should be a join of fields[2-and-up] in case the field contains a | we split on
             break;
         }
@@ -247,8 +259,8 @@ void TraceModel::addSystraceEvent(const TraceEvent &te)
                 return;
             }
             ppid = *it;
-            ThreadModel *tmodel = m_processModel->ensureThread(ppid, te.threadName());
-            tmodel->endDurationSlice();
+            ThreadModel *tmodel = ensureThread(ppid, te.threadName());
+            tmodel->endDurationSlice(te.timestamp() - m_earliestEvent);
             break;
         }
         case 'S': {
@@ -308,11 +320,6 @@ GpuFrequencyModel *TraceModel::gpuFrequencyModel() const
     return m_gpuFrequencyModel;
 }
 
-ProcessModel *TraceModel::processModel() const
-{
-    return m_processModel;
-}
-
 int TraceModel::maxCpuFrequency() const
 {
     return m_maxCpuFrequency;
@@ -321,6 +328,18 @@ int TraceModel::maxCpuFrequency() const
 int TraceModel::maxGpuFrequency() const
 {
     return m_maxGpuFrequency;
+}
+
+int TraceModel::threadCount() const
+{
+    return m_threadModels.count();
+}
+
+ThreadModel *TraceModel::threadModel(int threadIdx) const
+{
+    Q_ASSERT(threadIdx >= 0 && threadIdx < m_threadModels.count());
+
+    return m_threadModels.at(threadIdx);
 }
 
 // Thoughts about how to present this...

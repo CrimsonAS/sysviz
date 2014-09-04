@@ -39,6 +39,8 @@ ThreadModel::ThreadModel(QObject *parent, qlonglong pid, const QString &threadNa
     : QAbstractListModel(parent)
     , m_pid(pid)
     , m_threadName(threadName)
+    , m_maxStackDepth(0)
+    , m_currentStackDepth(0)
 {
 }
 
@@ -51,9 +53,6 @@ QVariant ThreadModel::data(const QModelIndex &index, int role) const
 {
     switch (role)
     {
-        // TODO: do any of these roles really make sense? maybe it makes more
-        // sense to expose a list of the top level slices (QObject* only) and
-        // get all properties off them
         case ThreadModel::StartTimeRole:
             return m_topLevelSlices.at(index.row())->startTime().toDouble();
         case ThreadModel::EndTimeRole:
@@ -79,15 +78,26 @@ void ThreadModel::addDurationSlice(const TraceTime &time, QString text)
     // start of a new top level slice
     if (m_currentSliceStack.count() == 0) {
         m_topLevelSlices.append(tm);
+        m_currentStackDepth = 1;
     } else {
         tm->setParentSlice(m_currentSliceStack.top());
+        m_currentStackDepth++;
     }
+
+    if (m_currentStackDepth > m_maxStackDepth) {
+        m_maxStackDepth = m_currentStackDepth;
+        qDebug() << "Max stack depth for PID " << pid() << " thread " << threadName() << " is now " << m_maxStackDepth;
+        emit maxStackDepthChanged();
+   }
 
     m_currentSliceStack.push(tm);
 }
 
-void ThreadModel::endDurationSlice()
+void ThreadModel::endDurationSlice(const TraceTime &endTime)
 {
-    if (m_currentSliceStack.count() > 0)
-        m_currentSliceStack.pop();
+    if (m_currentSliceStack.count() > 0) {
+        ThreadModelSlice *tm = m_currentSliceStack.pop();
+        tm->setEndTime(endTime);
+        m_currentStackDepth--;
+    }
 }

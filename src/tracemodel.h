@@ -9,8 +9,8 @@ class TraceEvent;
 #include "cpufrequencymodel.h"
 #include "cpucstatemodel.h"
 #include "gpufrequencymodel.h"
+#include "threadmodel.h"
 #include "tracetime.h"
-#include "processmodel.h"
 
 class TraceModel : public QObject
 {
@@ -37,15 +37,21 @@ public:
     Q_INVOKABLE CpuCStateModel *cpuCStateModel(int cpu) const;
 
     Q_INVOKABLE GpuFrequencyModel *gpuFrequencyModel() const;
-    Q_INVOKABLE ProcessModel *processModel() const;
+
+    Q_PROPERTY(int threadCount READ threadCount NOTIFY threadCountChanged)
+    int threadCount() const;
+
+    Q_INVOKABLE ThreadModel *threadModel(int threadIdx) const;
 
 signals:
     void cpuCountChanged();
     void traceLengthChanged();
     void maxCpuFrequencyChanged();
     void maxGpuFrequencyChanged();
+    void threadCountChanged();
 
 private:
+    ThreadModel *ensureThread(qlonglong pid, const QString &threadName);
     void addSystraceEvent(const TraceEvent &te);
 
 private:
@@ -54,7 +60,7 @@ private:
     QVector<CpuFrequencyModel *> m_cpuFrequencyModels;
     QVector<CpuCStateModel *> m_cpuCStateModels;
     GpuFrequencyModel *m_gpuFrequencyModel;
-    ProcessModel *m_processModel;
+    QVector<ThreadModel *> m_threadModels;
     int m_maxCpuFrequency;
     int m_maxGpuFrequency;
 };
