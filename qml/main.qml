@@ -101,6 +101,12 @@ Rectangle {
                 }
             }
 
+            ViewLabel {
+                height: root.rowHeight
+                width: parent.width
+                text: "IO Events"
+            }
+
             Repeater {
                 model: traceModel.threadCount
                 ViewLabel {
@@ -154,6 +160,14 @@ Rectangle {
                     pps: header.pps;
                     maxFrequency: traceModel.maxCpuFrequency
                 }
+            }
+
+            FrequencyView {
+                model: traceModel.ioTrafficModel()
+                width: flickable.contentWidth
+                height: Math.floor(1 * cm);
+                pps: header.pps
+                maxFrequency: traceModel.maxIOTraffic
             }
 
             Repeater {

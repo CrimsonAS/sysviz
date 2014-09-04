@@ -9,6 +9,7 @@
 #include "cpufrequencymodel.h"
 #include "gpufrequencymodel.h"
 #include "threadmodel.h"
+#include "iotrafficmodel.h"
 
 #include <sys/time.h>
 
@@ -16,11 +17,13 @@ TraceModel::TraceModel()
     : m_gpuFrequencyModel(0)
     , m_maxCpuFrequency(0)
     , m_maxGpuFrequency(0)
+    , m_ioTrafficModel(0)
 {
     qmlRegisterType<CpuFrequencyModel>();
     qmlRegisterType<CpuCStateModel>();
     qmlRegisterType<GpuFrequencyModel>();
     qmlRegisterType<ThreadModel>();
+    qmlRegisterType<IOTrafficModel>();
 
     m_earliestEvent.tv_sec = std::numeric_limits<long>::max();
 #if defined(Q_OS_MAC)
@@ -151,19 +154,14 @@ void TraceModel::addEvent(const TraceEvent &te)
 
         m_gpuFrequencyModel->changeFrequency(te.timestamp() - m_earliestEvent, khz);
     } else if (te.eventName() == "block_rq_issue") {
-        // TODO: parse later
-        static bool warned = false;
-        if (!warned) {
-            qWarning() << "I don't yet know how to handle event of type " << te.eventName();
-            warned = true;
+        int evcount = ioTrafficModel()->recordIOStart(te.timestamp() - m_earliestEvent);
+        if (evcount >= m_maxIOTraffic) {
+            qDebug() << "New top IO event count: " << evcount;
+            m_maxIOTraffic = evcount;
+            emit maxIOTrafficChanged();
         }
     } else if (te.eventName() == "block_rq_complete") {
-        // TODO: parse later
-        static bool warned = false;
-        if (!warned) {
-            qWarning() << "I don't yet know how to handle event of type " << te.eventName();
-            warned = true;
-        }
+        ioTrafficModel()->recordIOEnd(te.timestamp() - m_earliestEvent);
     } else if (te.eventName() == "sched_switch") {
         // TODO: parse later
         static bool warned = false;
@@ -342,3 +340,17 @@ ThreadModel *TraceModel::threadModel(int threadIdx) const
     return m_threadModels.at(threadIdx);
 }
 
+int TraceModel::maxIOTraffic() const
+{
+    return m_maxIOTraffic;
+}
+
+IOTrafficModel *TraceModel::ioTrafficModel() const
+{
+    if (!m_ioTrafficModel) {
+        TraceModel *that = const_cast<TraceModel *>(this);
+        that->m_ioTrafficModel = new IOTrafficModel(that);
+    }
+
+    return m_ioTrafficModel;
+}
