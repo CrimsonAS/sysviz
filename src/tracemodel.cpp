@@ -36,7 +36,7 @@ TraceModel::TraceModel()
     m_latestEvent.tv_usec = std::numeric_limits<long>::min();
 #endif
 
-    QFile f("trace.systrace");
+    QFile f("data/trace.systrace");
     if (!f.open(QIODevice::ReadOnly)) {
         qWarning("Can't open trace");
         return;
