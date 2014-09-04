@@ -141,10 +141,6 @@ Rectangle {
                     height: Math.max(root.rowHeight, 10 * tm.maxStackDepth)
                     width: parent.width
                     text: "PID: " + tm.pid + "\n" + tm.threadName
-
-                    Component.onCompleted: {
-                        console.log(tm)
-                    }
                 }
             }
         }

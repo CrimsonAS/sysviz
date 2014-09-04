@@ -71,7 +71,6 @@ int IOTrafficModel::recordIOStart(const TraceTime &start)
     // is current" endtime until we know the real end time..
     m_slices.append(new IOTrafficSlice(start, start, eventCount));
     m_currentSlice = m_slices.last();
-    qDebug() << "Started I/O slice, event count " << eventCount;
     return eventCount;
 }
 
@@ -81,5 +80,4 @@ void IOTrafficModel::recordIOEnd(const TraceTime &time)
         m_currentSlice->setEndTime(time);
         m_currentSlice = 0;
     }
-    qDebug() << "Ending I/O slice";
 }
