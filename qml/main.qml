@@ -24,20 +24,47 @@ Rectangle {
         property real pps: 200;
         focus: true
 
+        ParallelAnimation {
+            id: zoomAnimation
+            NumberAnimation { id: ppsAnim; target: header; property: "pps"; duration: 250; easing.type: Easing.OutQuad }
+            NumberAnimation { id: flickAnima; target: flickable; property: "contentX"; duration: 250; easing.type: Easing.OutQuad }
+            function start(pps) {
+                if (zoomAnimation.running)
+                    return;
+                // Limit pps to the width of the trace.
+                pps = Math.max(header.width / traceModel.traceLength, pps);
+                var d = pps / header.pps;
+                var contentMove = header.width / 2 * d;
+                ppsAnim.to = pps;
+                flickAnima.to = Math.max(0, (flickable.contentX + header.width / 2) * d - header.width / 2);
+                zoomAnimation.running = true;
+            }
+        }
+
+        NumberAnimation {
+            id: moveAnimation
+            target: flickable; property: "contentX"; duration: 250; easing.type: Easing.OutQuad;
+            function start(delta) {
+                if (moveAnimation.running)
+                    return;
+                // bound the target so we don't go outside..
+                to = Math.min(flickable.contentWidth - header.width, Math.max(0, flickable.contentX + delta));
+                running = true;
+            }
+        }
+
         Keys.onPressed: {
             // TODO: is the zoom in/out behaviour optimal? right now it changes
             // contentX by the same factor, but maybe we want to keep the view
             // centered?
             if (event.key == Qt.Key_Up || event.key == Qt.Key_W) {
-                pps *= 1.1
-                flickable.contentX *= 1.1
+                zoomAnimation.start(header.pps * 2.0);
             } else if (event.key == Qt.Key_Down || event.key == Qt.Key_S) {
-                pps *= 0.9
-                flickable.contentX *= 0.9
+                zoomAnimation.start(header.pps * 0.5);
             } else if (event.key == Qt.Key_Left || event.key == Qt.Key_A) {
-                flickable.contentX -= 100
+                moveAnimation.start(-header.width * 0.33);
             } else if (event.key == Qt.Key_Right || event.key == Qt.Key_D) {
-                flickable.contentX += 100
+                moveAnimation.start(header.width * 0.33);
             }
         }
 
