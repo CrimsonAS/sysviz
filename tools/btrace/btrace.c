@@ -187,7 +187,10 @@ static bool setWorkqueueTracingEnabled(bool enable)
 // Enable or disable tracing of the GPU power frequency
 static bool setGpuPowerTracingEnabled(bool enable)
 {
-    return setKernelOptionEnable(k_gpuEnablePath, enable);
+    if (access(k_gpuEnablePath, F_OK) != -1)
+        return setKernelOptionEnable(k_gpuEnablePath, enable);
+    else
+        return true;
 }
 
 // Enable or disable tracing of disk I/O.
