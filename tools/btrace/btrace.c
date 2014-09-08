@@ -26,6 +26,7 @@
 #include <signal.h>
 #include <time.h>
 #include <getopt.h>
+#include <unistd.h>
 
 /* we only really support Linux, but add in some buildability for OS X too, to
  * make changes easier to verify. (that is, make sure we don't break it.) */
