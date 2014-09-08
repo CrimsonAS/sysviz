@@ -160,9 +160,6 @@ Rectangle {
 
     focus: true
     Keys.onPressed: {
-        // TODO: is the zoom in/out behaviour optimal? right now it changes
-        // contentX by the same factor, but maybe we want to keep the view
-        // centered?
         if (event.key == Qt.Key_Up || event.key == Qt.Key_W) {
             zoomAnimation.start(header.pps * 2.0);
         } else if (event.key == Qt.Key_Down || event.key == Qt.Key_S) {
