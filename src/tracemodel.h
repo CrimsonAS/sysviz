@@ -20,6 +20,7 @@ public:
 
     TraceModel();
     void initFromFile(QFile *f);
+    void initFromSystrace(QFile *f);
     void addEvent(const TraceEvent &te);
 
     Q_PROPERTY(int cpuCount READ cpuCount NOTIFY cpuCountChanged)
