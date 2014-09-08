@@ -22,11 +22,22 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/sendfile.h>
 #include <time.h>
 #include <signal.h>
 #include <time.h>
 #include <getopt.h>
+
+/* we only really support Linux, but add in some buildability for OS X too, to
+ * make changes easier to verify. (that is, make sure we don't break it.) */
+#ifdef __linux__
+# include <sys/sendfile.h>
+#elif defined(__APPLE__) && defined(__MACH__)
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <sys/uio.h>
+#endif
+
+
 #define NELEM(x) ((int) (sizeof(x) / sizeof((x)[0])))
 
 /* Command line options */
@@ -299,7 +310,14 @@ static void dumpTrace()
     }
 
     ssize_t sent = 0;
-    while ((sent = sendfile(STDOUT_FILENO, traceFD, NULL, 64*1024*1024)) > 0);
+    size_t length = 64 * 1024 * 1024;
+#ifdef __linux__
+    while ((sent = sendfile(STDOUT_FILENO, traceFD, NULL, length)) > 0);
+#elif defined(__APPLE__) && defined(__MACH__)
+    off_t olength = length;
+    off_t offset = 0;
+    while ((sent = sendfile(STDOUT_FILENO, traceFD, offset, &olength, NULL, 0)));
+#endif
     if (sent == -1) {
         fprintf(stderr, "error dumping trace: %s (%d)\n", strerror(errno),
                 errno);
