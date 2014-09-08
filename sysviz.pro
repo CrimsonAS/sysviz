@@ -39,4 +39,5 @@ OTHER_FILES += \
     qml/FrequencyView.qml \
     qml/RowGradient.qml \
     qml/LabelBackground.qml \
-    qml/ViewLabel.qml
+    qml/ViewLabel.qml \
+    qml/Header.qml
