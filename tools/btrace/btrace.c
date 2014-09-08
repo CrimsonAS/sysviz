@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <sys/sendfile.h>
 #include <time.h>
-#include <zlib.h>
 #include <signal.h>
 #include <time.h>
 #include <getopt.h>
@@ -41,7 +40,6 @@ static bool g_traceWorkqueue = false;
 static bool g_traceOverwrite = false;
 static bool g_traceGpuPower = false;
 static int g_traceBufferSizeKB = 2048;
-static bool g_compress = false;
 
 /* Global state */
 static bool g_traceAborted = false;
@@ -300,88 +298,11 @@ static void dumpTrace()
         return;
     }
 
-    if (g_compress) {
-        z_stream zs;
-        uint8_t *in, *out;
-        int result, flush;
-
-        bzero(&zs, sizeof(zs));
-        result = deflateInit(&zs, Z_DEFAULT_COMPRESSION);
-        if (result != Z_OK) {
-            fprintf(stderr, "error initializing zlib: %d\n", result);
-            close(traceFD);
-            return;
-        }
-
-        const size_t bufSize = 64*1024;
-        in = (uint8_t*)malloc(bufSize);
-        out = (uint8_t*)malloc(bufSize);
-        flush = Z_NO_FLUSH;
-
-        zs.next_out = out;
-        zs.avail_out = bufSize;
-
-        do {
-
-            if (zs.avail_in == 0) {
-                // More input is needed.
-                result = read(traceFD, in, bufSize);
-                if (result < 0) {
-                    fprintf(stderr, "error reading trace: %s (%d)\n",
-                            strerror(errno), errno);
-                    result = Z_STREAM_END;
-                    break;
-                } else if (result == 0) {
-                    flush = Z_FINISH;
-                } else {
-                    zs.next_in = in;
-                    zs.avail_in = result;
-                }
-            }
-
-            if (zs.avail_out == 0) {
-                // Need to write the output.
-                result = write(STDOUT_FILENO, out, bufSize);
-                if ((size_t)result < bufSize) {
-                    fprintf(stderr, "error writing deflated trace: %s (%d)\n",
-                            strerror(errno), errno);
-                    result = Z_STREAM_END; // skip deflate error message
-                    zs.avail_out = bufSize; // skip the final write
-                    break;
-                }
-                zs.next_out = out;
-                zs.avail_out = bufSize;
-            }
-
-        } while ((result = deflate(&zs, flush)) == Z_OK);
-
-        if (result != Z_STREAM_END) {
-            fprintf(stderr, "error deflating trace: %s\n", zs.msg);
-        }
-
-        if (zs.avail_out < bufSize) {
-            size_t bytes = bufSize - zs.avail_out;
-            result = write(STDOUT_FILENO, out, bytes);
-            if ((size_t)result < bytes) {
-                fprintf(stderr, "error writing deflated trace: %s (%d)\n",
-                        strerror(errno), errno);
-            }
-        }
-
-        result = deflateEnd(&zs);
-        if (result != Z_OK) {
-            fprintf(stderr, "error cleaning up zlib: %d\n", result);
-        }
-
-        free(in);
-        free(out);
-    } else {
-        ssize_t sent = 0;
-        while ((sent = sendfile(STDOUT_FILENO, traceFD, NULL, 64*1024*1024)) > 0);
-        if (sent == -1) {
-            fprintf(stderr, "error dumping trace: %s (%d)\n", strerror(errno),
-                    errno);
-        }
+    ssize_t sent = 0;
+    while ((sent = sendfile(STDOUT_FILENO, traceFD, NULL, 64*1024*1024)) > 0);
+    if (sent == -1) {
+        fprintf(stderr, "error dumping trace: %s (%d)\n", strerror(errno),
+                errno);
     }
 
     close(traceFD);
@@ -400,8 +321,7 @@ static void showHelp(const char *cmd)
                     "  -l              trace CPU frequency governor load\n"
                     "  -s              trace the kernel scheduler switches\n"
                     "  -t N            trace for N seconds [defualt 5]\n"
-                    "  -w              trace the kernel workqueue\n"
-                    "  -z              compress the trace dump\n");
+                    "  -w              trace the kernel workqueue\n");
 }
 
 static void handleSignal(int signo) {
@@ -488,10 +408,6 @@ int main(int argc, char **argv)
                     exit(1);
                 }
                 g_traceWorkqueue = true;
-            break;
-
-            case 'z':
-                g_compress = true;
             break;
 
             default:
