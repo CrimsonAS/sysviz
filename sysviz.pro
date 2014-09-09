@@ -18,7 +18,8 @@ SOURCES = \
     src/cpucstatemodel.cpp \
     src/gpufrequencymodel.cpp \
     src/threadmodel.cpp \
-    src/iotrafficmodel.cpp
+    src/iotrafficmodel.cpp \
+    src/traceview.cpp
 
 HEADERS = \
     src/tracemodel.h \
@@ -28,7 +29,8 @@ HEADERS = \
     src/tracetime.h \
     src/gpufrequencymodel.h \
     src/threadmodel.h \
-    src/iotrafficmodel.h
+    src/iotrafficmodel.h \
+    src/traceview.h
 
 CONFIG -= app_bundle
 CONFIG += c++11
@@ -40,4 +42,5 @@ OTHER_FILES += \
     qml/RowGradient.qml \
     qml/LabelBackground.qml \
     qml/ViewLabel.qml \
-    qml/Header.qml
+    qml/Header.qml \
+    qml/ThreadSlice.qml

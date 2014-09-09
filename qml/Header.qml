@@ -5,17 +5,13 @@ import "theme.js" as Theme;
 RowGradient {
     id: root
 
-    anchors.left: labels.right
-    anchors.right: parent.right
-    height: Math.floor(0.5 * cm);
-
     clip: true
 
     property real pps: 20 * cm;         // pixels per second
     property real unit: 1;              // Unit scale factor of 10^x, where x is an integer.
     property real ppu: pps * unit;      // Pixels per unit
 
-    property real startTime: flickable.contentX / pps;
+    property real startTime: 0;
 
     property real pixelsToStartTime: startTime * pps;
     property int fUnitIndex: Math.ceil(pixelsToStartTime / ppu);

@@ -3,35 +3,6 @@
 #include "threadmodel.h"
 #include "slice.h"
 
-class ThreadModelSlice : public Slice
-{
-public:
-    ThreadModelSlice(const TraceTime &startTime, const TraceTime &endTime, const QString &text)
-    : Slice(startTime, endTime)
-    , m_text(text)
-    , m_parent(0)
-    {
-    }
-
-    QString text() const { return m_text; }
-
-    void setParentSlice(ThreadModelSlice *parent)
-    {
-        Q_ASSERT(!m_parent);
-        m_parent = parent;
-
-        parent->m_children.append(this);
-    }
-    ThreadModelSlice *parentSlice() const { return m_parent; }
-
-    QVector<ThreadModelSlice *> childSlices() const { return m_children; }
-
-private:
-    QString m_text;
-    ThreadModelSlice *m_parent;
-    QVector<ThreadModelSlice *> m_children;
-};
-
 
 // XXX: threads have an id, perhaps we should use the tid for unique
 // identification, and keep the name for display purposes only
@@ -57,6 +28,8 @@ QVariant ThreadModel::data(const QModelIndex &index, int role) const
             return m_topLevelSlices.at(index.row())->startTime().toDouble();
         case ThreadModel::EndTimeRole:
             return m_topLevelSlices.at(index.row())->endTime().toDouble();
+        case ThreadModel::TextRole:
+            return m_topLevelSlices.at(index.row())->text();
     }
 
     Q_UNREACHABLE();

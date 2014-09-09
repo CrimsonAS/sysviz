@@ -6,7 +6,38 @@
 #include <QList>
 
 #include "tracetime.h"
+#include "slice.h"
+
 class ThreadModelSlice;
+
+class ThreadModelSlice : public Slice
+{
+public:
+    ThreadModelSlice(const TraceTime &startTime, const TraceTime &endTime, const QString &text)
+    : Slice(startTime, endTime)
+    , m_text(text)
+    , m_parent(0)
+    {
+    }
+
+    QString text() const { return m_text; }
+
+    void setParentSlice(ThreadModelSlice *parent)
+    {
+        Q_ASSERT(!m_parent);
+        m_parent = parent;
+
+        parent->m_children.append(this);
+    }
+    ThreadModelSlice *parentSlice() const { return m_parent; }
+
+    QVector<ThreadModelSlice *> childSlices() const { return m_children; }
+
+private:
+    QString m_text;
+    ThreadModelSlice *m_parent;
+    QVector<ThreadModelSlice *> m_children;
+};
 
 class ThreadModel : public QAbstractListModel
 {
@@ -16,7 +47,8 @@ public:
 
     enum ModelRoles {
         StartTimeRole = Qt::UserRole,
-        EndTimeRole
+        EndTimeRole,
+        TextRole
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
@@ -34,6 +66,8 @@ public:
 
     void addDurationSlice(const TraceTime &time, QString text);
     void endDurationSlice(const TraceTime &endTime);
+
+    const QList<ThreadModelSlice *> slices() const { return m_topLevelSlices; }
 
 signals:
     void maxStackDepthChanged();
