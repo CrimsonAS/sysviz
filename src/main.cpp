@@ -9,6 +9,7 @@
 #include <QScreen>
 
 #include "tracemodel.h"
+#include "traceview.h"
 
 #ifdef QT_DQML_LIB
 #include <dqml/dqmllocalserver.h>
@@ -17,11 +18,16 @@
 int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
-//    qmlRegisterType<TraceModel>("SysViz", 1, 0, "TraceModel");
+
+    qmlRegisterType<TraceView>("SysViz", 1, 0, "TraceView");
+    qmlRegisterType<TraceModel>();
 
     TraceModel model;
 
     QQuickView view;
+    QSurfaceFormat format = view.requestedFormat();
+    format.setSamples(16);
+    view.setFormat(format);
 
     view.rootContext()->setContextProperty("traceModel", &model);
     view.rootContext()->setContextProperty("cm", view.screen()->physicalDotsPerInch() / 2.54);
