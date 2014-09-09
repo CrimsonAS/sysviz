@@ -69,11 +69,8 @@ public:
     TraceModel *model() const { return m_model; }
     void setModel(TraceModel *model);
 
-    Q_PROPERTY(QQuickItem *viewportRoot READ viewportRoot WRITE setViewportRoot NOTIFY viewportRootChanged)
-    QQuickItem *viewportRoot() const { return m_viewportRoot; }
-    void setViewportRoot(QQuickItem *item);
-
     Q_INVOKABLE void recalibrate();
+    Q_INVOKABLE void reset();
 
 protected:
     void updatePolish();
@@ -84,14 +81,11 @@ signals:
     void modelChanged();
     void viewportRootChanged();
 
-public slots:
-
 private:
     void rebuildThreadSlices();
+    void rebuildLabels();
 
     TraceModel *m_model;
-
-    QQuickItem *m_viewportRoot;
 
     QQmlComponent *m_threadSliceDelegate;
     QQmlComponent *m_rowBackgroundDelegate;

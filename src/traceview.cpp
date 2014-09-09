@@ -111,7 +111,6 @@ void ThreadSubView::populate()
 TraceView::TraceView(QQuickItem *parent)
     : QQuickItem(parent)
     , m_model(0)
-    , m_viewportRoot(0)
     , m_threadSliceDelegate(0)
     , m_rowBackgroundDelegate(0)
     , m_nukeContent(false)
@@ -149,18 +148,15 @@ void TraceView::setRowBackgroundDelegate(QQmlComponent *delegate)
     polish();
 }
 
-void TraceView::setViewportRoot(QQuickItem *item)
-{
-    if (item == m_viewportRoot)
-        return;
-    m_nukeContent = true;
-    m_viewportRoot = item;
-    emit viewportRootChanged();
-}
-
 void TraceView::recalibrate()
 {
     m_rebuildThreadSlices = true;
+    polish();
+}
+
+void TraceView::reset()
+{
+    m_nukeContent = true;
     polish();
 }
 
@@ -171,20 +167,21 @@ void TraceView::updatePolish()
         return;
     }
 
-    if (!m_viewportRoot) {
-        qDebug() << "missing viewportRoot";
-        return;
-    }
+    bool buildLabels = false;
 
     if (m_nukeContent) {
         qDeleteAll(m_threads.values());
         m_threads.clear();
         m_rebuildThreadSlices = true;
         m_nukeContent = false;
+        buildLabels = true;
     }
 
     if (m_rebuildThreadSlices)
         rebuildThreadSlices();
+
+    if (buildLabels)
+        rebuildLabels();
 }
 
 void TraceView::rebuildThreadSlices()
@@ -205,11 +202,20 @@ void TraceView::rebuildThreadSlices()
         return;
     }
 
+    QQuickItem *contentRoot = qvariant_cast<QQuickItem *>(property("contentRoot"));
+    if (!contentRoot) {
+        qDebug() << "bad content root";
+        return;
+    }
+
+    double rowSpacing = property("rowSpacing").toDouble();
+
     int tc = m_model->threadCount();
     QQmlContext *context = QQmlEngine::contextForObject(this);
 
+    double y = 0;
+
     if (m_threads.size() == 0) {
-        double y = 0;
         for (int i=0; i<tc; ++i) {
             QObject *bgObj = m_rowBackgroundDelegate->create(context);
             QQuickItem *bg = qobject_cast<QQuickItem *>(bgObj);
@@ -221,7 +227,7 @@ void TraceView::rebuildThreadSlices()
             ThreadModel *tm = m_model->threadModel(i);
             qDebug() << " - trackng a new thread model..." << tm;
             bg->setPosition(QPointF(0, y));
-            bg->setParentItem(m_viewportRoot);
+            bg->setParentItem(contentRoot);
             bg->setHeight(threadSliceHeight * tm->maxStackDepth());
 
             ThreadSubView *view = new ThreadSubView(this, tm);
@@ -230,7 +236,7 @@ void TraceView::rebuildThreadSlices()
             view->setSliceHeight(threadSliceHeight);
             m_threads[tm] = view;
 
-            y += bg->height() + 1;
+            y += bg->height() + rowSpacing;
         }
     }
 
@@ -243,4 +249,57 @@ void TraceView::rebuildThreadSlices()
         view->setRange(start, end);
         view->populate();
     }
+
+    setProperty("contentHeight", y);
+}
+
+void TraceView::rebuildLabels()
+{
+    qDebug() << "rebuilding labels...";
+    QQmlComponent *labelDelegate = qvariant_cast<QQmlComponent *>(property("labelDelegate"));
+    if (!labelDelegate) {
+        qDebug() << "missing labelDelgate";
+        return;
+    }
+    QQuickItem *labelRoot = qvariant_cast<QQuickItem *>(property("labelRoot"));
+    if (!labelRoot) {
+        qDebug() << "missing labelRoot";
+        return;
+    }
+
+    double labelWidth = -1;
+
+    double threadSliceHeight = property("threadSliceHeight").toDouble();
+    double rowSpacing = property("rowSpacing").toDouble();
+    double y = 0;
+    QQmlContext *context = QQmlEngine::contextForObject(this);
+    QList<QQuickItem *> labels;
+    for (int i=0; i<m_model->threadCount(); ++i) {
+        QObject *o = labelDelegate->create(context);
+        QQuickItem *label = qobject_cast<QQuickItem *>(o);
+        if (!label) {
+            qDebug() << "labelDelegate does not produce QQuickItems";
+            delete o;
+            return;
+        }
+
+        ThreadModel *tm = m_model->threadModel(i);
+        label->setProperty("text", QString::fromLatin1("PID: %1\n%2")
+                           .arg(tm->pid())
+                           .arg(tm->threadName()));
+        label->setHeight(threadSliceHeight * tm->maxStackDepth());
+        label->setY(y);
+        label->setParentItem(labelRoot);
+
+        labels << label;
+        labelWidth = qMax(labelWidth, label->width());
+
+        y += label->height() + rowSpacing;
+    }
+
+    foreach (QQuickItem *label, labels)
+        label->setWidth(labelWidth);
+    setProperty("labelWidth", labelWidth);
+
+
 }

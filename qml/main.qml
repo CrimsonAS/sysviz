@@ -24,7 +24,7 @@ Rectangle {
         height: Math.floor(0.5 * cm);
 
         pps: view.pps;
-        startTime: contentRoot.contentX / pps;
+        startTime: view.startTime
     }
 
     TraceView {
@@ -36,9 +36,13 @@ Rectangle {
         property real labelWidth: 3 * cm
         property real pps: 10 * cm;
         property real viewportWidth: width - labelWidth;
+        property real contentHeight;
+        property real contentWidth: pps * traceModel.traceLength
 
-        property real startTime: contentRoot.contentX / pps;
-        property real endTime: startTime + contentRoot.width / pps;
+        property real rowSpacing: 1;
+
+        property real startTime: contentFlickable.contentX / pps;
+        property real endTime: startTime + contentFlickable.width / pps;
         property real threadSliceHeight: 0.5 * cm;
 
         onStartTimeChanged: recalibrate();
@@ -54,22 +58,37 @@ Rectangle {
         rowBackgroundDelegate: RowGradient {
             width: view.pps * traceModel.traceLength
         }
-        viewportRoot: contentRoot.contentItem
 
+        property Item contentRoot: contentFlickable.contentItem
         Flickable {
-            id: contentRoot;
+            id: contentFlickable;
             anchors.fill: parent;
             anchors.leftMargin: view.labelWidth;
-            contentWidth: view.pps * traceModel.traceLength
-            contentHeight: view.height // ### needs to be properly exposed from the model based on amount of rows..
+            contentWidth: view.contentWidth
+            contentHeight: view.contentHeight // ### needs to be properly exposed from the model based on amount of rows..
             clip: true;
+        }
+
+        property Component labelDelegate: ViewLabel { }
+        property Item labelRoot: labelContentRoot
+        Item {
+            id: labelRootParent
+            width: view.labelWidth
+            height: parent.height
+            clip: true
+            Item {
+                id: labelContentRoot;
+                y: -contentFlickable.contentY
+                width: parent.width
+                height: contentFlickable.contentHeight
+            }
         }
     }
 
     ParallelAnimation {
         id: zoomAnimation
         NumberAnimation { id: ppsAnim; target: view; property: "pps"; duration: 150; easing.type: Easing.OutQuint }
-        NumberAnimation { id: flickAnima; target: contentRoot; property: "contentX"; duration: 150; easing.type: Easing.OutQuint}
+        NumberAnimation { id: flickAnima; target: contentFlickable; property: "contentX"; duration: 150; easing.type: Easing.OutQuint}
         function start(pps) {
             if (zoomAnimation.running)
                 return;
@@ -78,19 +97,19 @@ Rectangle {
             var d = pps / view.pps;
             var contentMove = header.width / 2 * d;
             ppsAnim.to = pps;
-            flickAnima.to = Math.max(0, (contentRoot.contentX + header.width / 2) * d - header.width / 2);
+            flickAnima.to = Math.max(0, (contentFlickable.contentX + header.width / 2) * d - header.width / 2);
             zoomAnimation.running = true;
         }
     }
 
     NumberAnimation {
         id: moveAnimation
-        target: contentRoot; property: "contentX"; duration: 150; easing.type: Easing.OutQuint;
+        target: contentFlickable; property: "contentX"; duration: 150; easing.type: Easing.OutQuint;
         function start(delta) {
             if (moveAnimation.running)
                 return;
             // bound the target so we don't go outside..
-            to = Math.min(contentRoot.contentWidth - header.width, Math.max(0, contentRoot.contentX + delta));
+            to = Math.min(contentFlickable.contentWidth - header.width, Math.max(0, contentFlickable.contentX + delta));
             running = true;
         }
     }
