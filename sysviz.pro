@@ -19,7 +19,8 @@ SOURCES = \
     src/gpufrequencymodel.cpp \
     src/threadmodel.cpp \
     src/iotrafficmodel.cpp \
-    src/traceview.cpp
+    src/graphitem.cpp \
+    src/threadsliceview.cpp
 
 HEADERS = \
     src/tracemodel.h \
@@ -30,7 +31,8 @@ HEADERS = \
     src/gpufrequencymodel.h \
     src/threadmodel.h \
     src/iotrafficmodel.h \
-    src/traceview.h
+    src/graphitem.h \
+    src/threadsliceview.h
 
 CONFIG -= app_bundle
 CONFIG += c++11
@@ -43,4 +45,5 @@ OTHER_FILES += \
     qml/LabelBackground.qml \
     qml/ViewLabel.qml \
     qml/Header.qml \
-    qml/ThreadSlice.qml
+    qml/ThreadSlice.qml \
+    qml/TraceView.qml

@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-Rectangle {
+Item {
     id: root;
 
     property real depth;
@@ -10,9 +10,11 @@ Rectangle {
 
     property Text labelItem;
 
-    color: Qt.hsla(0.6, 0.5, 0.4 + 0.4 * depth);
-
-    antialiasing: true;
+    Rectangle {
+        anchors.fill: parent
+        anchors.bottomMargin: 1
+        color: Qt.hsla(0.6, 0.5, 0.4 + 0.4 * depth);
+    }
 
     onWidthChanged: showOrHideLabel()
 

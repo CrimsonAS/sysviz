@@ -1,48 +1,30 @@
-import QtQuick 2.0
+import QtQuick 2.3
+import SysViz 1.0
+import "theme.js" as Theme
 
 RowGradient {
     id: root
 
-    width: 100
-    height: 50
+    property alias graphType: graphItem.graphType
+    property alias color: graphItem.color
+    property alias model: graphItem.model
+    property real pps;
+    property real max;
 
-    property QtObject model;
-
-    property real padding: 2
-    property real pps: 1000;
-
-    property real maxFrequency: 1404000
-
-    Repeater {
-        id: repeater
-        model: root.model
-
-        Rectangle {
-
-            radius: 3
-
-            x: startTime * root.pps
-            width: (endTime - startTime) * root.pps
-
-            property real hz: frequency / root.maxFrequency
-
-            y: (root.height - padding) - height
-            height: hz * (root.height - padding * 2);
-
-            color: Qt.hsla((1 - hz) * 0.33, 1, 0.5, 0.5);
-
-            antialiasing: true
-
-//            Text {
-//                color: "white"
-//                text: frequency
-//                font.pixelSize: 10
-//                anchors.centerIn: parent
-//                rotation: -90
-//            }
-        }
+    GraphItem {
+        id: graphItem
+        model: traceModel.cpuFrequencyModel(index);
+        y: Theme.sizes.columnPadding * cm
+        height: parent.height - Theme.sizes.columnPadding * 2 * cm
+        transform:
+            Matrix4x4 {
+                property real sx: root.pps;
+                property real sy: graphItem.height / root.max
+                matrix: Qt.matrix4x4(sx, 0, 0, 0,
+                                     0, -sy, 0, graphItem.height,
+                                     0, 0, 1, 0,
+                                     0, 0, 0, 1);
+            }
+        graphType: GraphItem.BarGraph
     }
-
-
-
 }
