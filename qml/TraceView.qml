@@ -6,7 +6,7 @@ Item {
     id: root
 
     property real labelWidth: 3 * cm
-    property real pps: 1 * cm;
+    property real pps: 10 * cm;
     property real viewportWidth: width - labelWidth;
     property real contentWidth: pps * traceModel.traceLength
 
@@ -18,6 +18,10 @@ Item {
     property real threadSliceHeight: 0.5 * cm;
 
     property Item contentRoot: contentFlickable.contentItem
+
+    signal displayToolTip(string text)
+    signal hideToolTip()
+
     Flickable {
         id: contentFlickable;
         anchors.fill: parent;
@@ -87,7 +91,14 @@ Item {
                             visible = yEnd > 0 && yStart < contentFlickable.height;
                         }
 
-                        onVisibleChanged: print("toggled: " + visible + model.threadName + ":" + model.pid);
+                        onHoveringOver: {
+                            if (item == null)
+                                root.hideToolTip();
+                            else
+                                root.displayToolTip(item.label + "; length="
+                                                    + Math.round((item.endTime - item.startTime) * 100000) / 100
+                                                    + " ms; " + "start=" + item.startTime);
+                        }
                     }
                 }
             }

@@ -9,6 +9,7 @@ ThreadSliceView::ThreadSliceView()
     , m_end(0)
     , m_rebuild(false)
 {
+    setAcceptHoverEvents(true);
 }
 
 void ThreadSliceView::setDelegate(QQmlComponent *component)
@@ -116,4 +117,16 @@ void ThreadSliceView::updatePolish()
 
     setHeight(heightOfDelegate());
 }
+
+void ThreadSliceView::hoverMoveEvent(QHoverEvent *e)
+{
+    QPointF pos = e->posF();
+    QQuickItem *child = childAt(pos.x(), pos.y());
+    if (child && strstr(child->metaObject()->className(), "ThreadSlice"))
+        emit hoveringOver(child);
+    else
+        emit hoveringOver(0);
+    QQuickItem::hoverMoveEvent(e);
+}
+
 

@@ -27,11 +27,34 @@ Rectangle {
         startTime: view.startTime
     }
 
+    Text {
+        id: statusBar
+        color: "white"
+        font.pixelSize: 0.2 * cm;
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: 0.1 * cm
+    }
+
     TraceView {
         id: view;
-        anchors.fill: parent
-        anchors.topMargin: header.height
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: header.bottom
+        anchors.bottom: statusBar.top
+        anchors.bottomMargin: 0.1 * cm
+
+        onDisplayToolTip: {
+            statusBar.text = text;
+        }
+        onHideToolTip: {
+            statusBar.text = "";
+        }
     }
+
+
+
 
 
     focus: true
