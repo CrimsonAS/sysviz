@@ -32,12 +32,15 @@ public:
 
 protected:
     void updatePolish() Q_DECL_OVERRIDE;
+    void hoverMoveEvent(QHoverEvent *e) Q_DECL_OVERRIDE;
 
 signals:
     void delegateChanged();
     void startTimeChanged();
     void endTimeChanged();
     void modelChanged();
+
+    void hoveringOver(QQuickItem *item);
 
 private:
     inline bool inRange(ThreadModelSlice *slice) {
