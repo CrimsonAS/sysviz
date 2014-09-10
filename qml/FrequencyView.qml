@@ -26,6 +26,5 @@ RowGradient {
                                      0, 0, 0, 1);
             }
         graphType: GraphItem.BarGraph
-        color: Qt.hsla(0, 0.8, 0.3, 0.25);
     }
 }

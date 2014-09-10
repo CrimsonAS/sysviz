@@ -57,7 +57,9 @@ Item {
             Repeater {
                 id: threadSliceRepeater
                 model: traceModel.threadCount
+
                 RowGradient {
+                    id: threadSliceViewRoot
                     width: root.contentWidth
                     height: sliceView.height + 2 * Theme.sizes.columnPadding * cm
                     ThreadSliceView {
@@ -65,13 +67,27 @@ Item {
                         y: Theme.sizes.columnPadding * cm
                         model: traceModel.threadModel(index);
                         width: parent.width
-                        startTime: root.startTime
-                        endTime: root.endTime
+                        startTime: visible ? root.startTime : 0
+                        endTime: visible ? root.endTime : 0
                         delegate: ThreadSlice {
                             x: startTime * root.pps
                             height: Theme.sizes.sliceHeight * cm;
                             width: (endTime - startTime) * root.pps;
                         }
+
+                        Connections {
+                            target: contentFlickable
+                            onContentXChanged: sliceView.updateVisibility();
+                            onHeightChanged: sliceView.updateVisibility();
+                        }
+
+                        function updateVisibility() {
+                            var yStart = mapToItem(contentFlickable, 0, 0).y
+                            var yEnd = mapToItem(contentFlickable, 0, height).y
+                            visible = yEnd > 0 && yStart < contentFlickable.height;
+                        }
+
+                        onVisibleChanged: print("toggled: " + visible + model.threadName + ":" + model.pid);
                     }
                 }
             }

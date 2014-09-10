@@ -41,9 +41,9 @@ Rectangle {
         } else if (event.key == Qt.Key_Down || event.key == Qt.Key_S) {
             view.startZoomAnimation(view.pps * 0.5);
         } else if (event.key == Qt.Key_Left || event.key == Qt.Key_A) {
-            view.startMoveAnimation(-header.width * 0.33);
+            view.startMoveAnimation(-header.width * 0.2);
         } else if (event.key == Qt.Key_Right || event.key == Qt.Key_D) {
-            view.startMoveAnimation(header.width * 0.33);
+            view.startMoveAnimation(header.width * 0.2);
         }
     }
 
