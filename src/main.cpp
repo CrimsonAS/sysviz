@@ -9,7 +9,8 @@
 #include <QScreen>
 
 #include "tracemodel.h"
-#include "traceview.h"
+#include "threadsliceview.h"
+#include "graphitem.h"
 
 #ifdef QT_DQML_LIB
 #include <dqml/dqmllocalserver.h>
@@ -19,8 +20,13 @@ int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
 
-    qmlRegisterType<TraceView>("SysViz", 1, 0, "TraceView");
+//    qmlRegisterType<TraceView>("SysViz", 1, 0, "TraceView");
+    qmlRegisterType<ThreadSliceView>("SysViz", 1, 0, "ThreadSliceView");
+    qmlRegisterType<GraphItem>      ("SysViz", 1, 0, "GraphItem");
     qmlRegisterType<TraceModel>();
+    qmlRegisterType<QAbstractListModel>();
+    qmlRegisterType<CpuFrequencyModel>();
+    qmlRegisterType<GpuFrequencyModel>();
 
     TraceModel model;
 

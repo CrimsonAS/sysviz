@@ -28,102 +28,22 @@ Rectangle {
     }
 
     TraceView {
-        id: view
-
+        id: view;
         anchors.fill: parent
         anchors.topMargin: header.height
-
-        property real labelWidth: 3 * cm
-        property real pps: 10 * cm;
-        property real viewportWidth: width - labelWidth;
-        property real contentHeight;
-        property real contentWidth: pps * traceModel.traceLength
-
-        property real rowSpacing: 1;
-
-        property real startTime: contentFlickable.contentX / pps;
-        property real endTime: startTime + contentFlickable.width / pps;
-        property real threadSliceHeight: 0.5 * cm;
-
-        onStartTimeChanged: recalibrate();
-        onEndTimeChanged: recalibrate();
-        onPpsChanged: recalibrate();
-        onViewportWidthChanged: recalibrate();
-
-        model: traceModel;
-        threadSliceDelegate: ThreadSlice {
-            x: startTime * view.pps;
-            width: (endTime - startTime) * view.pps;
-        }
-        rowBackgroundDelegate: RowGradient {
-            width: view.pps * traceModel.traceLength
-        }
-
-        property Item contentRoot: contentFlickable.contentItem
-        Flickable {
-            id: contentFlickable;
-            anchors.fill: parent;
-            anchors.leftMargin: view.labelWidth;
-            contentWidth: view.contentWidth
-            contentHeight: view.contentHeight // ### needs to be properly exposed from the model based on amount of rows..
-            clip: true;
-        }
-
-        property Component labelDelegate: ViewLabel { }
-        property Item labelRoot: labelContentRoot
-        Item {
-            id: labelRootParent
-            width: view.labelWidth
-            height: parent.height
-            clip: true
-            Item {
-                id: labelContentRoot;
-                y: -contentFlickable.contentY
-                width: parent.width
-                height: contentFlickable.contentHeight
-            }
-        }
     }
 
-    ParallelAnimation {
-        id: zoomAnimation
-        NumberAnimation { id: ppsAnim; target: view; property: "pps"; duration: 150; easing.type: Easing.OutQuint }
-        NumberAnimation { id: flickAnima; target: contentFlickable; property: "contentX"; duration: 150; easing.type: Easing.OutQuint}
-        function start(pps) {
-            if (zoomAnimation.running)
-                return;
-            // Limit pps to the width of the trace.
-            pps = Math.max(header.width / traceModel.traceLength, pps);
-            var d = pps / view.pps;
-            var contentMove = header.width / 2 * d;
-            ppsAnim.to = pps;
-            flickAnima.to = Math.max(0, (contentFlickable.contentX + header.width / 2) * d - header.width / 2);
-            zoomAnimation.running = true;
-        }
-    }
-
-    NumberAnimation {
-        id: moveAnimation
-        target: contentFlickable; property: "contentX"; duration: 150; easing.type: Easing.OutQuint;
-        function start(delta) {
-            if (moveAnimation.running)
-                return;
-            // bound the target so we don't go outside..
-            to = Math.min(contentFlickable.contentWidth - header.width, Math.max(0, contentFlickable.contentX + delta));
-            running = true;
-        }
-    }
 
     focus: true
     Keys.onPressed: {
         if (event.key == Qt.Key_Up || event.key == Qt.Key_W) {
-            zoomAnimation.start(view.pps * 2.0);
+            view.startZoomAnimation(view.pps * 2.0);
         } else if (event.key == Qt.Key_Down || event.key == Qt.Key_S) {
-            zoomAnimation.start(view.pps * 0.5);
+            view.startZoomAnimation(view.pps * 0.5);
         } else if (event.key == Qt.Key_Left || event.key == Qt.Key_A) {
-            moveAnimation.start(-header.width * 0.33);
+            view.startMoveAnimation(-header.width * 0.33);
         } else if (event.key == Qt.Key_Right || event.key == Qt.Key_D) {
-            moveAnimation.start(header.width * 0.33);
+            view.startMoveAnimation(header.width * 0.33);
         }
     }
 

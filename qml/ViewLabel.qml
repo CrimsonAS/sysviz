@@ -7,8 +7,8 @@ Rectangle {
     width: label.width + 0.5 * cm
 
     gradient: Gradient {
-        GradientStop { position: 0; color: Qt.hsla(0.66, 0.1, 0.3); }
-        GradientStop { position: 1; color: Qt.hsla(0.66, 0.1, 0.2); }
+        GradientStop { position: 0; color: Qt.hsla(0.66, 0.1, 0.5); }
+        GradientStop { position: 1; color: Qt.hsla(0.66, 0.1, 0.4); }
     }
 
    Text {

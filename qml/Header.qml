@@ -14,12 +14,12 @@ RowGradient {
     property real startTime: 0;
 
     property real pixelsToStartTime: startTime * pps;
-    property int fUnitIndex: Math.ceil(pixelsToStartTime / ppu);
+    property int fUnitIndex: Math.floor(pixelsToStartTime / ppu);
     property real fUnitPixels: fUnitIndex * ppu;
     property real fUnitOffset: fUnitPixels - pixelsToStartTime;
     property real fUnitTime: fUnitIndex * unit;
 
-    property int unitCount: Math.ceil(width / ppu);
+    property int unitCount: Math.ceil(width / ppu) + 1;
 
     property bool alternateLabelsOnly : false;
 
