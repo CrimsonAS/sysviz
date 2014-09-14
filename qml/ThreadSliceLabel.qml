@@ -1,25 +1,14 @@
 import QtQuick 2.0
 
-Item {
-    id: root;
-
-    property real depth;
-    property real startTime;
-    property real endTime;
-    property string label;
+ThreadSliceBase {
+    id: root
 
     property Text labelItem;
-
-    Rectangle {
-        anchors.fill: parent
-        anchors.bottomMargin: 1
-        color: Qt.hsla(0.6, 0.5, 0.4 + 0.4 * depth);
-    }
 
     onWidthChanged: showOrHideLabel()
 
     function showOrHideLabel() {
-        if (width > 0.5 * cm) {
+        if (width > 1 * cm) {
             if (labelItem == undefined)
                 labelItem = textComponent.createObject(root, { text: root.label } )
         } else if (labelItem != undefined) {

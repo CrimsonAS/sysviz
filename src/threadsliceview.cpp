@@ -7,6 +7,7 @@ ThreadSliceView::ThreadSliceView()
     , m_delegate(0)
     , m_start(0)
     , m_end(0)
+    , m_minSliceLength(0)
     , m_rebuild(false)
 {
     setAcceptHoverEvents(true);
@@ -47,6 +48,16 @@ void ThreadSliceView::setModel(ThreadModel *model)
     m_model = model;
     m_rebuild = true;
     emit modelChanged();
+    polish();
+}
+
+void ThreadSliceView::setMinimumSliceLength(double min)
+{
+    if (m_minSliceLength == min)
+        return;
+    m_minSliceLength = min;
+    m_rebuild = true;
+    emit minimumSliceLengthChanged();
     polish();
 }
 

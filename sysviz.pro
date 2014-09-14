@@ -46,4 +46,7 @@ OTHER_FILES += \
     qml/ViewLabel.qml \
     qml/Header.qml \
     qml/ThreadSlice.qml \
-    qml/TraceView.qml
+    qml/TraceView.qml \
+    qml/ThreadSliceBase.qml \
+    qml/ThreadSliceBox.qml \
+    qml/ThreadSliceLabel.qml
