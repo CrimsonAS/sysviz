@@ -16,21 +16,10 @@ Rectangle {
         GradientStop { position: 1; color: Qt.hsla(0, 0, 0.2); }
     }
 
-    Header {
-        id: header;
-
-        x: view.labelWidth;
-        width: view.viewportWidth;
-        height: Math.floor(0.5 * cm);
-
-        pps: view.pps;
-        startTime: view.startTime
-    }
-
     Text {
         id: statusBar
         color: "white"
-        font.pixelSize: 0.2 * cm;
+        font.pixelSize: 0.25 * cm;
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -39,11 +28,9 @@ Rectangle {
 
     TraceView {
         id: view;
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: header.bottom
-        anchors.bottom: statusBar.top
-        anchors.bottomMargin: 0.1 * cm
+        width: parent.width
+        height: parent.height - statusBar.height - 0.2 * cm - header.height
+        y: header.height
 
         onDisplayToolTip: {
             statusBar.text = text;
@@ -53,6 +40,25 @@ Rectangle {
         }
     }
 
+    Item {
+        width: view.viewportWidth
+        x: view.width - view.viewportWidth
+        height: parent.height
+        clip: true;
+
+        Header {
+            id: header;
+
+            x: 0
+            width: parent.width
+            height: Math.floor(0.5 * cm);
+
+            pps: view.pps;
+            startTime: view.startTime
+
+            viewHeight: view.height
+        }
+    }
 
 
 

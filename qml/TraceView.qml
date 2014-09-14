@@ -66,6 +66,35 @@ Item {
                     id: threadSliceViewRoot
                     width: root.contentWidth
                     height: sliceView.height + 2 * Theme.sizes.columnPadding * cm
+
+                    ThreadSliceView {
+                        id: threadSliceBg;
+                        y: Theme.sizes.columnPadding * cm
+                        model: traceModel.threadModel(index);
+                        width: parent.width
+                        startTime: 0;
+                        endTime: traceModel.traceLength
+                        transform: Scale {
+                            xScale: root.pps
+                        }
+
+                        delegate: ThreadSliceBox {
+                            x: startTime
+                            height: Theme.sizes.sliceHeight * cm;
+                            width: (endTime - startTime);
+                        }
+
+                        onHoveringOver: {
+                            if (item == null)
+                                root.hideToolTip();
+                            else
+                                root.displayToolTip(item.label + "; length="
+                                                    + Math.round((item.endTime - item.startTime) * 100000) / 100
+                                                    + " ms; " + "start=" + item.startTime);
+                        }
+                    }
+
+
                     ThreadSliceView {
                         id: sliceView;
                         y: Theme.sizes.columnPadding * cm
@@ -73,7 +102,10 @@ Item {
                         width: parent.width
                         startTime: visible ? root.startTime : 0
                         endTime: visible ? root.endTime : 0
-                        delegate: ThreadSlice {
+                        minimumSliceLength: 2 * cm / root.pps;
+                        // Set enabled to false so the other threaSliceBg gets the hover events
+                        enabled: false
+                        delegate: ThreadSliceLabel {
                             x: startTime * root.pps
                             height: Theme.sizes.sliceHeight * cm;
                             width: (endTime - startTime) * root.pps;
@@ -90,15 +122,7 @@ Item {
                             var yEnd = mapToItem(contentFlickable, 0, height).y
                             visible = yEnd > 0 && yStart < contentFlickable.height;
                         }
-
-                        onHoveringOver: {
-                            if (item == null)
-                                root.hideToolTip();
-                            else
-                                root.displayToolTip(item.label + "; length="
-                                                    + Math.round((item.endTime - item.startTime) * 100000) / 100
-                                                    + " ms; " + "start=" + item.startTime);
-                        }
+                        onVisibleChanged: calibrate();
                     }
                 }
             }

@@ -5,8 +5,6 @@ import "theme.js" as Theme;
 RowGradient {
     id: root
 
-    clip: true
-
     property real pps: 20 * cm;         // pixels per second
     property real unit: 1;              // Unit scale factor of 10^x, where x is an integer.
     property real ppu: pps * unit;      // Pixels per unit
@@ -22,6 +20,8 @@ RowGradient {
     property int unitCount: Math.ceil(width / ppu) + 1;
 
     property bool alternateLabelsOnly : false;
+
+    property real viewHeight;
 
 
     Component.onCompleted: updateUnitScale();
@@ -74,6 +74,12 @@ RowGradient {
                         : Math.round(time * 1000) + " ms"
                       : Math.round(time) + " s";
                 font.pixelSize: root.height * 0.4;
+            }
+            Rectangle {
+                anchors.top: parent.bottom
+                height: root.viewHeight
+                width: 1
+                color: Qt.hsla(0, 0, 0, 0.1);
             }
 
             Repeater {
