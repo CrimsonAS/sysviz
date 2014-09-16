@@ -20,10 +20,11 @@ Rectangle {
         id: statusBar
         color: "white"
         font.pixelSize: 0.25 * cm;
-        anchors.bottom: parent.bottom
+        anchors.baseline: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: 0.1 * cm
+        anchors.margins: 0.1 * cm;
+        anchors.baselineOffset: - Math.floor(0.15 * cm)
     }
 
     TraceView {
