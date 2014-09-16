@@ -8,7 +8,7 @@ ThreadSliceBase {
     onWidthChanged: showOrHideLabel()
 
     function showOrHideLabel() {
-        if (width > 1 * cm) {
+        if (width > 2 * cm) {
             if (labelItem == undefined)
                 labelItem = textComponent.createObject(root, { text: root.label } )
         } else if (labelItem != undefined) {
