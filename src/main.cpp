@@ -59,6 +59,7 @@ int main(int argc, char **argv)
 
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl::fromLocalFile("qml/main.qml"));
+    view.setTitle("sysviz");
     view.show();
 
 #ifdef QT_DQML_LIB
